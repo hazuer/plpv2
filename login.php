@@ -16,9 +16,6 @@ if(isset($_SESSION["uActive"])){
 <html lang="es-MX">
       <head>
          <?php include_once('head.php');?>
-         <script>
-         let base_url = '<?php echo BASE_URL;?>';
-         </script>
       </head>
    <body class="inner_page login">
       <div class="full_container">

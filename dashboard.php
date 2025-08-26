@@ -11,9 +11,6 @@ require_once('includes/session.php');
 <html lang="es-MX">
       <head>
          <?php include_once('head.php');?>
-         <script>
-         let base_url = '<?php echo BASE_URL;?>';
-         </script>
       </head>
 <body class="dashboard dashboard_1">
       <div class="full_container">
@@ -89,31 +86,8 @@ require_once('includes/session.php');
             </div>
          </div>
       </div>
-      <!-- jQuery -->
-      <!--<script src="js/jquery.min.js"></script>
-      <script src="js/popper.min.js"></script>
-      <script src="js/bootstrap.min.js"></script>-->
-      <script src="<?php echo BASE_URL;?>/assets/js/libraries/jquery-3.2.1.min.js"></script>
-      <script src="<?php echo BASE_URL;?>/assets/js/libraries/popper.min.js"></script>
-      <script src="<?php echo BASE_URL;?>/assets/js/libraries/bootstrap.min.js"></script>
-      <!-- wow animation -->
-      <script src="js/animate.js"></script>
-      <!-- select country -->
-      <script src="js/bootstrap-select.js"></script>
-      <!-- owl carousel -->
-      <script src="js/owl.carousel.js"></script> 
-      <!-- chart js -->
-      <script src="js/Chart.min.js"></script>
-      <script src="js/Chart.bundle.min.js"></script>
-      <script src="js/utils.js"></script>
-      <script src="js/analyser.js"></script>
-      <!-- nice scrollbar -->
-      <!-- <script src="js/perfect-scrollbar.min.js"></script>-->
-      <script>
-         var ps = new PerfectScrollbar('#sidebar');
-      </script>
-      <!-- custom js -->
-      <script src="js/custom.js"></script>
-      <script src="js/chart_custom_style1.js"></script>
+      <?php
+      require_once('footer.php');
+      ?>
    </body>
 </html>

