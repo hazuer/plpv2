@@ -10,7 +10,7 @@ $(document).ready(function() {
 		})
 		.then((willDelete) => {
 			if (willDelete) {
-				window.location.href = `${base_url}/controllers/indexController.php?option=logoff`;
+				window.location.href = `${base_url}/controllers/loginController.php?option=logoff`;
 			} else {
 				return false;
 			}

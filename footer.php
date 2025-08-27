@@ -1,3 +1,7 @@
+<?php
+include('modal/scan-code.php');
+include('modal/info-guia.php');
+?>
 
 <!-- jQuery -->
 <!--<script src="js/jquery.min.js"></script>

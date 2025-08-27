@@ -25,20 +25,6 @@
     box-shadow: 0 0 5px rgba(3,169,244,0.4);
 }
 </style>
-<?php
-$url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
-$url .= "://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-$pagina = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_FILENAME);
-$display='initial';
-if($pagina=='dashboard'){
-   $display='none';
-}
-$txtchg    = ($_SESSION['uLocation']==2) ? "Tlaquiltenango":"Zacatepec";
-$txtchgval = ($_SESSION['uLocation']==2) ? 1:2;
-$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://";
-// Host
-$host = $_SERVER['HTTP_HOST'];
-?>
 
 <div class="topbar">
     <nav class="navbar navbar-expand-lg navbar-light">
@@ -59,7 +45,7 @@ $host = $_SERVER['HTTP_HOST'];
                     <ul class="user_profile_dd" style="display: <?php echo $display; ?>">
                         <li style="background-color: #03a9f4 !important;"> <!-- #15283c !important -->
                             <a class="dropdown-toggle" data-toggle="dropdown">
-                                <span class="name_user"><i class="fa fa-bars"></i> Menu</span>
+                                <span class="name_user"><i class="fa fa-bars"></i> <?php echo $pagina;?></span>
                             </a>
                             <div class="dropdown-menu">
                                  <?php 
@@ -79,34 +65,40 @@ $host = $_SERVER['HTTP_HOST'];
                                  <a href="dashboard.html"><span>Envio manual</span></a>
                                  <?php 
                                     }
-                                 ?>
-                                 <?php 
-                                 if($pagina=='reports'){
-                                    ?>
-                                 <a href="media_gallery.html"><span>Porcentaje entrega</span></a>
-                                 <?php
-                                }?>
-                                 <!--<a href="email.html"><span>Nuevo contacto</span></a>
 
-                                 <a href="dashboard.html"><span>Folio</span></a>
-                                 <a href="dashboard.html"><span>Sin rotular</span></a>
+                                 if($pagina=='reports' || $pagina=='reportspe'|| $pagina=='prereg' || $pagina=='audit'){
+                                    ?>
+                                    <a href="reports.php"><span>Reporte personalizado</span></a>
+                                 <a href="reportspe.php"><span>Porcentaje entrega</span></a>
+                                 <a href="prereg.php"><span>Sin rotular</span></a>
+                                  <a href="audit.php"><span>Auditoria</span></a>
+                                 <?php
+                                }
+                                 if($pagina=='contacts'){
+                                    ?>
+                                 <a href="#" id="btn-add-contact"><span>Nuevo contacto</span></a>
+                                    <?php }
+                                    if($pagina=='admin'){
+                                    ?>
+                                 <a href="admin.php"><span>Inventario</span></a>
+                                  <a href="dashboard.html"><span>Folio</span></a>
                                  <a href="dashboard.html"><span>Crear código barras</span></a>
                                  <a href="dashboard.html"><span>Guías no liberadas</span></a>
-                                 <a href="dashboard.html"><span>Inventario</span></a>
                                  <a href="dashboard.html"><span>Cambiar estatus</span></a>
-                                 <a href="dashboard.html"><span>Cambiar ubicación</span></a>-->
+                                 <a href="dashboard.html"><span>Cambiar ubicación</span></a>
+                                 <?php } ?>
                             </div>
                         </li>
                     </ul>
                 </div>
 
             </div>
-            <input type="text" class="search_input" placeholder="Rotular/Verificar">
+            <input type="text" class="search_input" placeholder="Rotular/Verificar" id="vGuia">
             <!-- Menú de iconos y usuario a la derecha -->
             <div class="right_topbar">
                 <div class="icon_info">
                     <ul>
-                        <li><a href="#"><i class="fa fa-qrcode"></i></a></li>
+                        <li><a href="#" id="btn-scan-qr"><i class="fa fa-qrcode"></i></a></li>
                         <li><a href="#"><i class="fa fa-comments-o"></i><span class="badge online_animation">3</span></a></li>
                     </ul>
                     <ul class="user_profile_dd">

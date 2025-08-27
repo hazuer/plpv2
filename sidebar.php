@@ -1,3 +1,17 @@
+<?php
+$url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
+$url .= "://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+$pagina = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_FILENAME);
+$display='initial';
+if($pagina=='dashboard'){
+   $display='none';
+}
+$txtchg    = ($_SESSION['uLocation']==2) ? "Tlaquiltenango":"Zacatepec";
+$txtchgval = ($_SESSION['uLocation']==2) ? 1:2;
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://";
+// Host
+$host = $_SERVER['HTTP_HOST'];
+?>            
             <nav id="sidebar" class="active">
                <div class="sidebar_blog_1">
                   <div class="sidebar-header">
@@ -34,9 +48,9 @@
                         <a href="contacts.php"><i class="fa fa-users red_color"></i> <span>Contactos</span></a>
                      </li>
                      <li>
-                        <a href="#additional_page"><i class="fa fa-dashboard  yellow_color"></i> <span>Admin</span></a>
+                        <a href="admin.php"><i class="fa fa-dashboard  yellow_color"></i> <span>Admin</span></a>
                      </li>
-                     <li><a href="tables.html"><i class="fa fa-sign-out orange_color"></i> <span>Salir</span></a></li>
+                     <li><a href="#" id="logoff"><i class="fa fa-sign-out orange_color"></i> <span>Salir</span></a></li>
                   </ul>
                </div>
             </nav>

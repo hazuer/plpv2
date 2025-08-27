@@ -172,13 +172,7 @@ $templateMsj = $user[0]['template'];
                <!-- dashboard inner -->
                <div class="midde_cont">
                   <div class="container-fluid">
-                     <div class="row column_title">
-                        <div class="col-md-12">
-                           <div class="page_title">
-                              <h2>En ruta</h2>
-                           </div>
-                        </div>
-                     </div>
+                     <div class="row" style="margin-bottom: 15px;"></div>
                      <!-- row -->
                      <div class="row">
                         <!-- table section -->
@@ -187,7 +181,7 @@ $templateMsj = $user[0]['template'];
 
                               <div class="table_section padding_infor_info">
                                  <div class="table-responsive-sm">
-                                    <table id="tbl-packages" class="table-responsive-sm table-striped table-hover" cellspacing="0" style="width:100%">
+                                    <table id="tbl-packages" class="table table-striped table-bordered nowrap table-hover" cellspacing="0" style="width:100%">
 						<thead>
 							<tr>
 								<th></th>

@@ -152,13 +152,11 @@ $packages = $db->select($sql);
                <!-- dashboard inner -->
                <div class="midde_cont">
                   <div class="container-fluid">
-                     <div class="row column_title">
-                        <div class="col-md-12">
+                    <div class="col-md-12">
                            <div class="page_title">
-                              <h2>Reportes</h2>
+                              <h2>Reporte personalizado</h2>
                            </div>
                         </div>
-                     </div>
                      <!-- row -->
                      <div class="row">
                         <!-- table section -->
@@ -247,9 +245,6 @@ $packages = $db->select($sql);
 					</div>
 					<div class="col-md-1"><br>
 						<button id="btn-f-erase" type="button" class="btn btn-default" title="Borrar">Borrar</button>
-					</div>
-					<div class="col-md-1"><br>
-						<button id="btn-admin" type="button" class="btn btn-primary" title="Admin">Admin</button>
 					</div>
 				</div>
 			</form>

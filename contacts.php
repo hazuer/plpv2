@@ -88,13 +88,7 @@ $contacts = $db->select($sql);
                <!-- dashboard inner -->
                <div class="midde_cont">
                   <div class="container-fluid">
-                     <div class="row column_title">
-                        <div class="col-md-12">
-                           <div class="page_title">
-                              <h2>Contactos</h2>
-                           </div>
-                        </div>
-                     </div>
+                     <div class="row" style="margin-bottom: 15px;"></div>
                      <!-- row -->
                      <div class="row">
                         <!-- table section -->
