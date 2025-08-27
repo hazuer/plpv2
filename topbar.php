@@ -80,10 +80,13 @@ $host = $_SERVER['HTTP_HOST'];
                                  <?php 
                                     }
                                  ?>
-                                 <!--reportes-->
-                                 <!--<a href="media_gallery.html"><span>Porcentaje entrega</span></a>
-
-                                 <a href="email.html"><span>Nuevo contacto</span></a>
+                                 <?php 
+                                 if($pagina=='reports'){
+                                    ?>
+                                 <a href="media_gallery.html"><span>Porcentaje entrega</span></a>
+                                 <?php
+                                }?>
+                                 <!--<a href="email.html"><span>Nuevo contacto</span></a>
 
                                  <a href="dashboard.html"><span>Folio</span></a>
                                  <a href="dashboard.html"><span>Sin rotular</span></a>

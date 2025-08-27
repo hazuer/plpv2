@@ -100,6 +100,29 @@ $templateMsj = $user[0]['template'];
 				text-align: center !important;
 				padding: 0px 0px !important;
 			}
+
+			#coincidencias {
+				position: absolute;
+				top: calc(100% - 13px); /* Posición debajo del campo #phone */
+				/*left: 0;*/
+				width: calc(100% - 5%);
+				max-height: 200px; /* Altura máxima para evitar el desplazamiento */
+				overflow-y: auto; /* Mostrar barra de desplazamiento vertical si es necesario */
+				background-color: #F8F9FA; /* Color de fondo */
+				border: 1px solid #ccc; /* Borde */
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra */
+				z-index: 1000; /* Z-index para que se superponga a otros elementos */
+			}
+
+			#coincidencias p {
+				padding: 10px;
+				margin: 0;
+				cursor: pointer; /* Cambiar el cursor al pasar sobre los elementos de la lista */
+			}
+
+			#coincidencias p:hover {
+				background-color: #D4EDDA; /* Cambiar el color de fondo al pasar el cursor */
+			}
         </style>
         <script>
 			function truncateText() {

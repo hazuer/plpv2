@@ -28,10 +28,10 @@
                      <li>
                         <a href="whatsapp.php"><i class="fa fa-paper-plane green_color"></i> <span>WhatsApp</span></a>
                      </li>                     <li>
-                        <a href="#element"><i class="fa fa-bar-chart purple_color"></i> <span>Reportes</span></a>
+                        <a href="reports.php"><i class="fa fa-bar-chart purple_color"></i> <span>Reportes</span></a>
                      </li>
                      <li>
-                        <a href="#apps"><i class="fa fa-users red_color"></i> <span>Contactos</span></a>
+                        <a href="contacts.php"><i class="fa fa-users red_color"></i> <span>Contactos</span></a>
                      </li>
                      <li>
                         <a href="#additional_page"><i class="fa fa-dashboard  yellow_color"></i> <span>Admin</span></a>
