@@ -1170,7 +1170,7 @@ async function sendMessageWhats(client, chatId, fullMessage, iconBot) {
 		];
 
 		// Incluir la biblioteca PHPBarcode
-		require_once('barcode.php');
+		require_once('../includes/barcode.php');
 
 		$sql ="SELECT 
 			p.tracking 

@@ -82,7 +82,6 @@
             </div>
             </form>
             <div class="modal-footer">
-                <button id="btn-show-address" type="button" class="btn btn-primary" title="Direcciones">Direcciones</button>
                 <button id="btn-save-contacto" type="button" class="btn btn-success" title="Guardar">Guardar</button>
                 <button type="button" class="btn btn-danger" title="Cerrar" data-dismiss="modal">Cerrar</button>
             </div>

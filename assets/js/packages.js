@@ -1758,14 +1758,11 @@ $(document).ready(function() {
 		}
 	}
 
-	$('#tbl-packages').on('dblclick', 'td:nth-child(3)', function() {
-        var phoneNumber = $(this).text().trim();
-        // Colocar el número en el campo de búsqueda
-        var searchInput = $('input[type="search"]');
-        searchInput.val(phoneNumber);
-        // Forzar un "input" o "keyup" para que DataTables detecte el cambio
-        searchInput.trigger('input').trigger('keyup');
-    });
+	$('#tbl-packages').on('click', 'td:nth-child(3)', function() {
+		var phoneNumber = $(this).text().trim();
+		var searchInput = $('input[type="search"]');
+		searchInput.val(phoneNumber).trigger('input').trigger('keyup');
+	});
 
 });
 

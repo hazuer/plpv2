@@ -16,6 +16,7 @@ if(isset($_SESSION["uActive"])){
 <html lang="es-MX">
       <head>
          <?php include_once('head.php');?>
+         <script src="<?php echo BASE_URL;?>/assets/js/login.js"></script>
       </head>
    <body class="inner_page login">
       <div class="full_container">
@@ -49,26 +50,5 @@ if(isset($_SESSION["uActive"])){
             </div>
          </div>
       </div>
-      <!-- jQuery -->
-      <!--<script src="js/jquery.min.js"></script>-->
-      <!-- <script src="js/popper.min.js"></script>
-      <script src="js/bootstrap.min.js"></script>-->
-      <script src="<?php echo BASE_URL;?>/assets/js/libraries/jquery-3.2.1.min.js"></script>
-      <script src="<?php echo BASE_URL;?>/assets/js/libraries/popper.min.js"></script>
-      <script src="<?php echo BASE_URL;?>/assets/js/libraries/bootstrap.min.js"></script>
-      <!-- wow animation -->
-      <script src="js/animate.js"></script>
-      <!-- select country -->
-      <script src="js/bootstrap-select.js"></script>
-      <!-- nice scrollbar -->
-      <!--<script src="js/perfect-scrollbar.min.js"></script>
-      <script>
-         var ps = new PerfectScrollbar('#sidebar');
-      </script>-->
-      <!-- custom js -->
-      <!--<script src="js/custom.js"></script>-->
-      <script src="<?php echo BASE_URL;?>/assets/js/login.js"></script>
-	   <script src="<?php echo BASE_URL;?>/assets/js/functions.js?version=<?php echo time();?>"></script>
-      <script src="<?php echo BASE_URL;?>/assets/js/libraries/sweetalert.min.js"></script>
    </body>
 </html>

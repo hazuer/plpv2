@@ -53,6 +53,7 @@
 <script>
     let base_url = '<?php echo BASE_URL;?>';
 </script>
+
 <script src="<?php echo BASE_URL;?>/assets/js/libraries/sweetalert.min.js"></script>
 <script src="<?php echo BASE_URL;?>/assets/js/functions.js?version=<?php echo time();?>"></script>
 <script src="<?php echo BASE_URL;?>/assets/js/libraries/html5-qrcode.min.js"></script>

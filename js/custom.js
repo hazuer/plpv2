@@ -17,14 +17,28 @@ $(document).ready(function () {
   /*-- sidebar js --*/
   $('#sidebarCollapse').on('click', function () {
     $('#sidebar').toggleClass('active');
+    $('#sidebar').show();
   });
-  /*-- calendar js --*/
-  /*$('#example14').calendar({
-    inline: true
-  });*/
-  //$('#example15').calendar();
-  /*-- tooltip js --*/
-  //$('[data-toggle="tooltip"]').tooltip();
+
+
+    function updateSidebar() {
+        if ($(window).width() <= 1024) {
+            $('#sidebar').removeClass('active'); // quitar active en móviles
+            $('#sidebar').show();
+        } else {
+            $('#sidebar').addClass('active'); // mantener active en pantallas grandes
+            $('#sidebar').show();
+        }
+    }
+
+    // Ejecutar al cargar la página
+    updateSidebar();
+
+    // Ejecutar cuando se cambia el tamaño de la ventana
+    $(window).resize(function() {
+        updateSidebar();
+    });
+
 });
 
 /*--------------------------------------

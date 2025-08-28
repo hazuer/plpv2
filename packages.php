@@ -58,18 +58,27 @@ $templateMsj = $user[0]['template'];
       <head>
          <?php include_once('head.php');?>
 
-<link href="<?php echo BASE_URL;?>/assets/css/libraries/jquery.dataTables.min.css" rel="stylesheet">
-<script src="<?php echo BASE_URL;?>/assets/js/libraries/jquery.dataTables.min.js"></script>
+		<link href="<?php echo BASE_URL;?>/assets/css/libraries/jquery.dataTables.min.css" rel="stylesheet">
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/jquery.dataTables.min.js"></script>
 
-<link href="<?php echo BASE_URL;?>/assets/css/libraries/buttons.dataTables.min.css" rel="stylesheet">
-<script src="<?php echo BASE_URL;?>/assets/js/libraries/dataTables.buttons.min.js"></script>
-<script src="<?php echo BASE_URL;?>/assets/js/libraries/jszip.min.js"></script>
-<script src="<?php echo BASE_URL;?>/assets/js/libraries/pdfmake.min.js"></script>
-<script src="<?php echo BASE_URL;?>/assets/js/libraries/vfs_fonts.js"></script>
-<script src="<?php echo BASE_URL;?>/assets/js/libraries/buttons.html5.min.js"></script>
-<link type="text/css" href="<?php echo BASE_URL;?>/assets/css/libraries/dataTables.checkboxes.css" rel="stylesheet"/>
-<script type="text/javascript" src="<?php echo BASE_URL;?>/assets/js/libraries/dataTables.checkboxes.min.js"></script>
-         <script>
+		<link href="<?php echo BASE_URL;?>/assets/css/libraries/buttons.dataTables.min.css" rel="stylesheet">
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/dataTables.buttons.min.js"></script>
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/jszip.min.js"></script>
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/pdfmake.min.js"></script>
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/vfs_fonts.js"></script>
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/buttons.html5.min.js"></script>
+		<link type="text/css" href="<?php echo BASE_URL;?>/assets/css/libraries/dataTables.checkboxes.css" rel="stylesheet"/>
+		<script type="text/javascript" src="<?php echo BASE_URL;?>/assets/js/libraries/dataTables.checkboxes.min.js"></script>
+
+         <script src="<?php echo BASE_URL;?>/assets/js/packages.js?version=<?php echo time(); ?>"></script>
+
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/jquery-ui.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css">
+
+
+		<script>
          let templateMsj    = `<?php echo $templateMsj;?>`;
          let uMarker        = `<?php echo $_SESSION["uMarker"];?>`;
          let uIdCatParcel   = `<?php echo $_SESSION["uIdCatParcel"];?>`;
@@ -77,8 +86,15 @@ $templateMsj = $user[0]['template'];
          let alto           = `<?php echo ALTO;?>`;
          let rVoice         = `<?php echo $_SESSION["uVoice"]; ?>`
          </script>
-         <script src="<?php echo BASE_URL;?>/assets/js/packages.js?version=<?php echo time(); ?>"></script>
-         		<style>
+		 
+        <style>
+			body {
+    /*color: #333;*/
+    /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+    font-size: 12.5px;
+    /*line-height: 1.42857;*/
+    padding-bottom: 50px;
+}
     		@media only screen and (max-width: 768px) {
                 table.dataTable td:nth-child(4),
                 table.dataTable th:nth-child(4) {
@@ -100,6 +116,11 @@ $templateMsj = $user[0]['template'];
 				text-align: center !important;
 				padding: 0px 0px !important;
 			}
+			@media only screen and (max-width: 768px) {
+    table.dataTable {
+        font-size: 10px; /* Reducción del tamaño de letra en un 25% */
+    }
+}
 
 			#coincidencias {
 				position: absolute;
@@ -158,7 +179,7 @@ $templateMsj = $user[0]['template'];
 			};
 		</script>
       </head>
-<body class="dashboard dashboard_1">
+	<body class="dashboard dashboard_1">
       <div class="full_container">
          <div class="inner_container">
             <!-- Sidebar  -->
@@ -182,93 +203,93 @@ $templateMsj = $user[0]['template'];
                               <div class="table_section padding_infor_info">
                                  <div class="table-responsive-sm">
                                     <table id="tbl-packages" class="table table-striped table-bordered nowrap table-hover" cellspacing="0" style="width:100%">
-						<thead>
-							<tr>
-								<th></th>
-								<th>guia</th>
-								<th>phone</th>
-								<th>id_location</th>
-								<th>c_date</th>
-								<th>folio</th>
-								<th>receiver</th>
-								<th>id_status</th>
-								<th>status_desc</th>
-								<th>note</th>
-								<th>id_contact</th>
-								<th>id_cat_parcel</th>
-								<th>parcel</th>
-								<th>messages</th>
-								<th>tdiast</th>
-								<th style="text-align: center; width:20%;">
-									<button type="button" id="confirmg" name="confirmg" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Confirmar Guías Seleccionadas">
-										<i class="fa fa-flag-o fa-lg" aria-hidden="true"></i>
-									</button>
-									<button type="button" id="releaseg" name="releaseg" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Liberar Guías Seleccionadas">
-										<i class="fa fa-check-square-o fa-lg" aria-hidden="true"></i>
-									</button>
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php foreach($packages as $d):
-								?>
-								<tr id="<?php echo 'row_id_'.$d['id_package']; ?>" style="<?php echo $d['id_status'] == 5 ? 'background-color:#A2D9A2' : $d['styleCtrlDays']; ?>" title="">
-								<td><?php echo $d['id_package']; ?></td>
-								<td><?php echo $d['tracking']; ?></td>
-								<td><?php echo $d['phone']; ?></td>
-								<td><?php echo $d['id_location']; ?></td>
-								<td><?php echo $d['c_date']; ?></td>
-								<td style="font-weight: bold; color: <?php echo $d['marker']; ?>;"><?php echo $d['folio']; ?></td>
-								<td><?php echo $d['receiver']; ?></td>
-								<td><?php echo $d['id_status']; ?></td>
-								<td style="<?php echo $d['colorErrorMessage']; ?>" > <?php echo $d['status_desc']; ?>
-							<?php
-							if($d['note']){?><span class="badge badge-pill badge-default" style="cursor: pointer;" title="<?php echo $d['note'];?>"><i class="fa fa-sticky-note-o" aria-hidden="true"></i> </span><?php }?>
-							</td>
-								<td><?php echo $d['note']; ?></td>
-								<td><?php echo $d['id_contact']; ?></td>
-								<td><?php echo $d['id_cat_parcel']; ?></td>
-								<td><?php echo $d['parcel']; ?></td>
-								<td><?php if($d['t_sms_sent']!=0){ ?>
-									<?php 
-									echo $d['n_date']
-									?>
-									<span class="badge badge-pill badge-info" style="cursor: pointer;" id="btn-details-p" title="Leer Mensaje"><?php echo $d['t_sms_sent']; ?> </span>
-								<?php }?></td>
-								<td>
-									<?php if($d['tdt']!=0){
-									 echo $d['tdt'];
-									}?>
-								</td>
-								</td>
-								<td style="text-align: center;">
-									<div class="row">
-										<div class="col-md-4">
-										<?php if($d['id_status']==2 || $d['id_status']==5 || $d['id_status']==7){ ?>
-											<span class="badge badge-pill badge-success" style="cursor: pointer;" id="btn-tbl-liberar" title="Liberar">
-												<i class="fa fa-check-square-o fa-lg" aria-hidden="true"></i>
-											</span>
-										<?php }?>
-										</div>
-										<div class="col-md-4">
-											<span class="badge badge-pill badge-info" style="cursor: pointer;" id="btn-records" title="Editar">
-												<i class="fa fa-edit fa-lg" aria-hidden="true"></i>
-											</span>
-										</div>
-										<div class="col-md-4">
-											<?php if($d['t_evidence']!=0){ ?>
-												<span class="badge badge-pill badge-warning" style="cursor: pointer;" id="btn-evidence" title="Evidencia(s)">
-													<i class="fa fa-file-image-o fa-lg" aria-hidden="true"></i>
-												</span>
+										<thead>
+											<tr>
+												<th></th>
+												<th>guia</th>
+												<th>phone</th>
+												<th>id_location</th>
+												<th>c_date</th>
+												<th>folio</th>
+												<th>receiver</th>
+												<th>id_status</th>
+												<th>status_desc</th>
+												<th>note</th>
+												<th>id_contact</th>
+												<th>id_cat_parcel</th>
+												<th>parcel</th>
+												<th>messages</th>
+												<th>tdiast</th>
+												<th style="text-align: center; width:20%;">
+													<button type="button" id="confirmg" name="confirmg" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Confirmar Guías Seleccionadas">
+														<i class="fa fa-flag-o fa-lg" aria-hidden="true"></i>
+													</button>
+													<button type="button" id="releaseg" name="releaseg" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Liberar Guías Seleccionadas">
+														<i class="fa fa-check-square-o fa-lg" aria-hidden="true"></i>
+													</button>
+												</th>
+											</tr>
+										</thead>
+										<tbody>
+											<?php foreach($packages as $d):
+												?>
+												<tr id="<?php echo 'row_id_'.$d['id_package']; ?>" style="<?php echo $d['id_status'] == 5 ? 'background-color:#A2D9A2' : $d['styleCtrlDays']; ?>" title="">
+												<td><?php echo $d['id_package']; ?></td>
+												<td><?php echo $d['tracking']; ?></td>
+												<td><?php echo $d['phone']; ?></td>
+												<td><?php echo $d['id_location']; ?></td>
+												<td><?php echo $d['c_date']; ?></td>
+												<td style="font-weight: bold; color: <?php echo $d['marker']; ?>;"><?php echo $d['folio']; ?></td>
+												<td><?php echo $d['receiver']; ?></td>
+												<td><?php echo $d['id_status']; ?></td>
+												<td style="<?php echo $d['colorErrorMessage']; ?>" > <?php echo $d['status_desc']; ?>
 											<?php
-											}?>
-										</div>
-									</div>
-								</td>
-								</tr>
-							<?php endforeach; ?>
-						</tbody>
-					</table>
+											if($d['note']){?><span class="badge badge-pill badge-default" style="cursor: pointer;" title="<?php echo $d['note'];?>"><i class="fa fa-sticky-note-o" aria-hidden="true"></i> </span><?php }?>
+											</td>
+												<td><?php echo $d['note']; ?></td>
+												<td><?php echo $d['id_contact']; ?></td>
+												<td><?php echo $d['id_cat_parcel']; ?></td>
+												<td><?php echo $d['parcel']; ?></td>
+												<td><?php if($d['t_sms_sent']!=0){ ?>
+													<?php 
+													echo $d['n_date']
+													?>
+													<span class="badge badge-pill badge-info" style="cursor: pointer;" id="btn-details-p" title="Leer Mensaje"><?php echo $d['t_sms_sent']; ?> </span>
+												<?php }?></td>
+												<td>
+													<?php if($d['tdt']!=0){
+													echo $d['tdt'];
+													}?>
+												</td>
+												</td>
+												<td style="text-align: center;">
+													<div class="row">
+														<div class="col-md-4">
+														<?php if($d['id_status']==2 || $d['id_status']==5 || $d['id_status']==7){ ?>
+															<span class="badge badge-pill badge-success" style="cursor: pointer;" id="btn-tbl-liberar" title="Liberar">
+																<i class="fa fa-check-square-o fa-lg" aria-hidden="true"></i>
+															</span>
+														<?php }?>
+														</div>
+														<div class="col-md-4">
+															<span class="badge badge-pill badge-info" style="cursor: pointer;" id="btn-records" title="Editar">
+																<i class="fa fa-edit fa-lg" aria-hidden="true"></i>
+															</span>
+														</div>
+														<div class="col-md-4">
+															<?php if($d['t_evidence']!=0){ ?>
+																<span class="badge badge-pill badge-warning" style="cursor: pointer;" id="btn-evidence" title="Evidencia(s)">
+																	<i class="fa fa-file-image-o fa-lg" aria-hidden="true"></i>
+																</span>
+															<?php
+															}?>
+														</div>
+													</div>
+												</td>
+												</tr>
+											<?php endforeach; ?>
+										</tbody>
+									</table>
                                  </div>
                               </div>
                            </div>
@@ -282,8 +303,17 @@ $templateMsj = $user[0]['template'];
          </div>
       </div>
       <?php
-      include('modal/package.php');
-      require_once('footer.php');
+		include('modal/folio.php');
+		include('modal/template.php');
+		include('modal/package.php');
+		include('modal/release.php');
+		include('modal/sync.php');
+		include('modal/bot.php');
+		include('modal/sms-report.php');
+		include('modal/evidence.php');
+		include('modal/photo-confirmed.php');
+		include('modal/pull-photo.php');
+		require_once('footer.php');
       ?>
    </body>
 </html>

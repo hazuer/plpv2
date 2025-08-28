@@ -32,15 +32,12 @@
             <button type="button" id="sidebarCollapse" class="sidebar_toggle">
                 <i class="fa fa-chevron-right"></i>
             </button>
-
             <!-- Logo -->
             <!--<div class="logo_section">
                 <a href="index.html"><img class="img-responsive" src="images/logo/logo.png" alt="#" /></a>
             </div>
             -->
-         
             <div class="left_topbar" style="margin-left:0px;">
-         
                 <div class="icon_info">
                     <ul class="user_profile_dd" style="display: <?php echo $display; ?>">
                         <li style="background-color: #03a9f4 !important;"> <!-- #15283c !important -->
@@ -48,50 +45,51 @@
                                 <span class="name_user"><i class="fa fa-bars"></i> <?php echo $pagina;?></span>
                             </a>
                             <div class="dropdown-menu">
-                                 <?php 
-                                 if($pagina=='packages'){
-                                 ?>
-                                <a href="#" id="btn-add-package"><span>Nuevo paquete</span></a>
-                                <?php 
-                                    }
-                                 if($pagina=='whatsapp'){
-                                 ?>
-                                 <!--mesajes-->
-                                 <a href="calendar.html"><span>Mensajes nuevos</span></a>
-                                 <a href="dashboard_2.html"><span>Plant. de whatsApp</span></a>
-                                 <a href="dashboard.html"><span>Enviar whatsApp</span></a>
-                                 <a href="dashboard_2.html"><span>Plantilla de bot</span></a>
-                                 <a href="dashboard_2.html"><span>Crear bot</span></a>
-                                 <a href="dashboard.html"><span>Envio manual</span></a>
-                                 <?php 
-                                    }
-
+                                <?php
+                                if($pagina=='packages'){
+                                ?>
+                                	<a href="#" id="btn-add-package"><span>Nuevo paquete</span></a>
+                                    <a href="#" id="btn-folio"><span>Folio</span></a>
+                                    <a href="#" id="btn-ocurre"><span>Crear código barras</span></a>
+                                    <a href="#" id="btn-sync"><span>Guías no liberadas</span></a>
+                                <?php
+                                }
+                                if($pagina=='whatsapp'){
+                                ?>
+                                 	<!--mesajes-->
+									<a href="#"><span>Mensajes nuevos</span></a>
+									<a href="#"><span>Plant. de whatsApp</span></a>
+									<a href="#"><span>Enviar whatsApp</span></a>
+									<a href="#"><span>Plantilla de bot</span></a>
+									<a href="#"><span>Crear bot</span></a>
+									<a href="#"><span>Envio manual</span></a>
+                                <?php
+                                }
                                  if($pagina=='reports' || $pagina=='reportspe'|| $pagina=='prereg' || $pagina=='audit'){
                                     ?>
                                     <a href="reports.php"><span>Reporte personalizado</span></a>
-                                 <a href="reportspe.php"><span>Porcentaje entrega</span></a>
-                                 <a href="prereg.php"><span>Sin rotular</span></a>
-                                  <a href="audit.php"><span>Auditoria</span></a>
-                                 <?php
+									<a href="reportspe.php"><span>Porcentaje entrega</span></a>
+									<a href="prereg.php"><span>Sin rotular</span></a>
+									<a href="audit.php"><span>Auditoria</span></a>
+                                <?php
                                 }
-                                 if($pagina=='contacts'){
-                                    ?>
-                                 <a href="#" id="btn-add-contact"><span>Nuevo contacto</span></a>
-                                    <?php }
-                                    if($pagina=='admin'){
-                                    ?>
+                                if($pagina=='contacts'){
+                                ?>
+                                 	<a href="#" id="btn-add-contact"><span>Nuevo contacto</span></a>
+                                <?php 
+								}
+                                if($pagina=='admin'){
+								?>
                                  <a href="admin.php"><span>Inventario</span></a>
-                                  <a href="dashboard.html"><span>Folio</span></a>
-                                 <a href="dashboard.html"><span>Crear código barras</span></a>
-                                 <a href="dashboard.html"><span>Guías no liberadas</span></a>
                                  <a href="dashboard.html"><span>Cambiar estatus</span></a>
                                  <a href="dashboard.html"><span>Cambiar ubicación</span></a>
-                                 <?php } ?>
+                                 <?php 
+								}
+								?>
                             </div>
                         </li>
                     </ul>
                 </div>
-
             </div>
             <input type="text" class="search_input" placeholder="Rotular/Verificar" id="vGuia">
             <!-- Menú de iconos y usuario a la derecha -->
