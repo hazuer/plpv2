@@ -35,7 +35,6 @@ $rowEmpty  = ["id_package"    => "0" ,
 	"address"       => ""
 ];
 
-
 foreach ($lineasTat as $linea) {
 	if (!empty($linea)) {
 		$slt = "SELECT 
@@ -179,8 +178,8 @@ foreach ($lineasTat as $linea) {
 										</div>
 									</form>
 									<hr>
-									<table id="tbl-reports" class="table table-striped table-bordered nowrap table-hover" cellspacing="0" style="width:100%">
-										<thead>
+									<table id="tbl-reports" class="table table-striped table-hover" cellspacing="0" style="width:100%">
+										<thead class="thead-dark">
 											<tr>
 												<th>id_package</th>
 												<th>location_desc</th>
@@ -212,7 +211,7 @@ foreach ($lineasTat as $linea) {
 											$folioColor = "<span style='font-weight: bold; color:".$d['marker']."'>".$d['folio']."</span>";
 											?>
 											<tr>
-											<td title="Ver Historial" id="id-logger" style="cursor: pointer; text-decoration: underline;"><?php echo $d['id_package']; ?></td>
+											<td data-toggle="tooltip" data-placement="top" title="Ver Historial" id="id-logger" style="cursor: pointer; text-decoration: underline;"><?php echo $d['id_package']; ?></td>
 											<td><?php echo $d['location_desc']; ?></td>
 											<td><?php echo $d['parcel_desc']; ?></td>
 											<td><?php echo $d['c_date']; ?></td>
@@ -227,7 +226,7 @@ foreach ($lineasTat as $linea) {
 											<td><?php echo $d['sms_by_user']; ?></td>
 											<td>
 												<?php if($d['t_sms_sent']==0){ echo "0";}else{ ?>
-													<span class="badge badge-pill badge-info" style="cursor: pointer;" id="btn-details" title="Ver"><?php echo $d['t_sms_sent']; ?></span>
+													<span class="badge badge-pill badge-info" style="cursor: pointer;" id="btn-details" data-toggle="tooltip" data-placement="top" title="Ver"><?php echo $d['t_sms_sent']; ?></span>
 												<?php
 												} ?>
 											</td>
@@ -236,7 +235,7 @@ foreach ($lineasTat as $linea) {
 											<td><?php echo $d['note']; ?></td>
 											<td>
 												<?php if($d['t_evidence']!=0){ ?>
-													<span class="badge badge-pill badge-warning" style="cursor: pointer;" id="btn-evidence" title="Evidencia(s)">
+													<span class="badge badge-pill badge-warning" style="cursor: pointer;" id="btn-evidence" data-toggle="tooltip" data-placement="top" title="Evidencia(s)">
 														<?php echo $d['t_evidence']; ?> <i class="fa fa-file-image-o fa-lg" aria-hidden="true"></i>
 													</span>
 												<?php

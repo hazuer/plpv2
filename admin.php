@@ -110,76 +110,68 @@ require_once('includes/session.php');
                            </div>
                         </div>
                      </div>
-                    
 
 					<div class="row ccolumn1 d-flex align-items-stretch">
-    <?php foreach ($groupedPackages as $initial => $packages): ?>
-        <div class="col-md-6 col-lg-4 d-flex">
-            <div class="full counter_section margin_bottom_30" style="display: block !important;">
-				<div style="text-align:center; font-size:14px; margin-top:10px;">
-                    <?php
-                    // Contadores
-                    $countJMX   = 0;
-                    $countCN    = 0;
-                    $countImile = 0;
+						<?php foreach ($groupedPackages as $initial => $packages): ?>
+							<div class="col-md-12 col-lg-4 d-flex">
+								<div class="full counter_section margin_bottom_30" style="display: block !important;">
+									<div style="text-align:center; font-size:14px; margin-top:10px;">
+										<?php
+										// Contadores
+										$countJMX   = 0;
+										$countCN    = 0;
+										$countImile = 0;
 
-                    foreach ($packages as $item) {
-                        if (strpos($item['tracking'], 'JMX') === 0) {
-                            $countJMX++;
-                        } else if (strpos($item['tracking'], 'CNMEX') === 0) {
-                            $countCN++;
-                        } else {
-                            $countImile++;
-                        }
-                    }
+										foreach ($packages as $item) {
+											if (strpos($item['tracking'], 'JMX') === 0) {
+												$countJMX++;
+											} else if (strpos($item['tracking'], 'CNMEX') === 0) {
+												$countCN++;
+											} else {
+												$countImile++;
+											}
+										}
+										?>
+									</div>
+									<div class="couter_icon">
+										<div>
+											<span style="font-size: 30px; font-weight: bold; color: #333;">
+												<?php echo $initial; ?>:<?php echo count($packages); ?>
+											</span>
+										</div>
+										<div class="d-flex justify-content-center gap-1" style="margin-top:10px;">
+											<?php if($countJMX > 0): ?>
+												<div style="background:#f8d568; padding:6px 12px; border-radius:8px; font-weight:bold;">JT: <?php echo $countJMX; ?></div>
+											<?php endif; ?>
 
-                    ?>
-                </div>
-                <div class="couter_icon">
-                    <div>
-                        <span style="font-size: 30px; font-weight: bold; color: #333;">
-							<?php echo $initial; ?>:<?php echo count($packages); ?>
-						</span>
-                    </div>
-					<div class="d-flex justify-content-center gap-1" style="margin-top:10px;">
-						<?php if($countJMX > 0): ?>
-							<div style="background:#f8d568; padding:6px 12px; border-radius:8px; font-weight:bold;">JT: <?php echo $countJMX; ?></div>
-						<?php endif; ?>
+											<?php if($countCN > 0): ?>
+												<div style="background:#007bff; color:#fff; padding:6px 12px; border-radius:8px; font-weight:bold;">CN: <?php echo $countCN; ?></div>
+											<?php endif; ?>
 
-						<?php if($countCN > 0): ?>
-							<div style="background:#007bff; color:#fff; padding:6px 12px; border-radius:8px; font-weight:bold;">CN: <?php echo $countCN; ?></div>
-						<?php endif; ?>
+											<?php if($countImile > 0): ?>
+												<div style="background:#03a9f4; color:#fff; padding:6px 12px; border-radius:8px; font-weight:bold;">IM: <?php echo $countImile; ?></div>
+											<?php endif; ?>
+										</div>
+									</div>
 
-						<?php if($countImile > 0): ?>
-							<div style="background:#03a9f4; color:#fff; padding:6px 12px; border-radius:8px; font-weight:bold;">IM: <?php echo $countImile; ?></div>
-						<?php endif; ?>
+									<div class="row" style="margin-top: 15px;">
+										<?php foreach ($packages as $package): ?>
+											<div class="col-4 col-sm-3 col-md-3 text-center" style="padding: 5px;" data-toggle="tooltip" data-placement="top" title="<?php echo $package['tracking'];?>-<?php echo $package['receiver'];?>">
+												<span style="color:<?php echo $package['marker'];?>; font-weight:bold;">
+													<input type="checkbox" autocomplete="off">
+													<?php echo $package['folio']; ?>
+												</span>
+											</div>
+										<?php endforeach; ?>
+									</div>
+
+								</div>
+							</div>
+						<?php endforeach; ?>
 					</div>
-                </div>
-				
-				
-				<div class="row" style="margin-top: 15px;">
-					<?php foreach ($packages as $package): ?>
-						<div class="col-4 col-sm-3 col-md-3 text-center" style="padding: 5px;" data-toggle="tooltip" data-placement="top" title="<?php echo $package['tracking'];?>-<?php echo $package['receiver'];?>">
-							<span style="color:<?php echo $package['marker'];?>; font-weight:bold;">
-								<input type="checkbox" autocomplete="off">
-								<?php echo $package['folio']; ?>
-							</span>
-						</div>
-					<?php endforeach; ?>
-				</div>
-
-
-
-            </div>
-        </div>
-    <?php endforeach; ?>
-</div>
-
-					
 
 
                   </div>
-         
                </div>
                <!-- end dashboard inner -->
             </div>

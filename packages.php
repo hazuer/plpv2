@@ -86,15 +86,8 @@ $templateMsj = $user[0]['template'];
          let alto           = `<?php echo ALTO;?>`;
          let rVoice         = `<?php echo $_SESSION["uVoice"]; ?>`
          </script>
-		 
         <style>
-			body {
-    /*color: #333;*/
-    /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
-    font-size: 12.5px;
-    /*line-height: 1.42857;*/
-    padding-bottom: 50px;
-}
+
     		@media only screen and (max-width: 768px) {
                 table.dataTable td:nth-child(4),
                 table.dataTable th:nth-child(4) {
@@ -116,11 +109,7 @@ $templateMsj = $user[0]['template'];
 				text-align: center !important;
 				padding: 0px 0px !important;
 			}
-			@media only screen and (max-width: 768px) {
-    table.dataTable {
-        font-size: 10px; /* Reducción del tamaño de letra en un 25% */
-    }
-}
+
 
 			#coincidencias {
 				position: absolute;
@@ -202,8 +191,8 @@ $templateMsj = $user[0]['template'];
 
                               <div class="table_section padding_infor_info">
                                  <div class="table-responsive-sm">
-                                    <table id="tbl-packages" class="table table-striped table-bordered nowrap table-hover" cellspacing="0" style="width:100%">
-										<thead>
+                                    <table id="tbl-packages" class="table table-striped table-hover" cellspacing="0" style="width:100%">
+										<thead class="thead-dark">
 											<tr>
 												<th></th>
 												<th>guia</th>
@@ -244,7 +233,7 @@ $templateMsj = $user[0]['template'];
 												<td><?php echo $d['id_status']; ?></td>
 												<td style="<?php echo $d['colorErrorMessage']; ?>" > <?php echo $d['status_desc']; ?>
 											<?php
-											if($d['note']){?><span class="badge badge-pill badge-default" style="cursor: pointer;" title="<?php echo $d['note'];?>"><i class="fa fa-sticky-note-o" aria-hidden="true"></i> </span><?php }?>
+											if($d['note']){?><span class="badge badge-pill badge-default" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="<?php echo $d['note'];?>"><i class="fa fa-sticky-note-o" aria-hidden="true"></i> </span><?php }?>
 											</td>
 												<td><?php echo $d['note']; ?></td>
 												<td><?php echo $d['id_contact']; ?></td>
@@ -254,7 +243,7 @@ $templateMsj = $user[0]['template'];
 													<?php 
 													echo $d['n_date']
 													?>
-													<span class="badge badge-pill badge-info" style="cursor: pointer;" id="btn-details-p" title="Leer Mensaje"><?php echo $d['t_sms_sent']; ?> </span>
+													<span class="badge badge-pill badge-info" style="cursor: pointer;" id="btn-details-p" data-toggle="tooltip" data-placement="top" title="Leer Mensaje"><?php echo $d['t_sms_sent']; ?> </span>
 												<?php }?></td>
 												<td>
 													<?php if($d['tdt']!=0){

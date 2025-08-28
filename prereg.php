@@ -90,8 +90,8 @@ $packages = $db->select($sql);
                               <div class="table_section padding_infor_info">
                                  <div class="table-responsive-sm">
                                     		
-                                 <table id="tbl-reports" class="table table-striped table-bordered nowrap table-hover" cellspacing="0" style="width:100%">
-										<thead>
+                                 <table id="tbl-reports"class="table table-striped table-hover" cellspacing="0" style="width:100%">
+										<thead class="thead-dark">
 											<tr>
 												<th>id_package</th>
 												<th>location_desc</th>

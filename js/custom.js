@@ -25,9 +25,13 @@ $(document).ready(function () {
         if ($(window).width() <= 1024) {
             $('#sidebar').removeClass('active'); // quitar active en móviles
             $('#sidebar').show();
+            $('#name_user').hide();
+            $('#vGuia').hide();
         } else {
             $('#sidebar').addClass('active'); // mantener active en pantallas grandes
             $('#sidebar').show();
+            $('#name_user').show();
+            $('#vGuia').show();
         }
     }
 

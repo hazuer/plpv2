@@ -231,17 +231,17 @@ $packages = $db->select($sql);
 											</div>
 											<div class="col-md-1"><br>
 												<div class="form-group">
-													<button id="btn-filter-rep" type="submit" class="btn btn-success" title="Filtrar" data-dismiss="modal">Filtrar</button>
+													<button id="btn-filter-rep" type="submit" class="btn btn-success" data-dismiss="modal">Filtrar</button>
 												</div>
 											</div>
 											<div class="col-md-1"><br>
-												<button id="btn-f-erase" type="button" class="btn btn-default" title="Borrar">Borrar</button>
+												<button id="btn-f-erase" type="button" class="btn btn-default">Borrar</button>
 											</div>
 										</div>
 									</form>
 									<hr>
-									<table id="tbl-reports" class="table table-striped table-bordered nowrap table-hover" cellspacing="0" style="width:100%">
-										<thead>
+									<table id="tbl-reports" class="table table-striped table-hover" cellspacing="0" style="width:100%">
+										<thead class="thead-dark">
 											<tr>
 												<th>id_package</th>
 												<th>location_desc</th>
@@ -273,7 +273,7 @@ $packages = $db->select($sql);
 												$folioColor = "<span style='font-weight: bold; color:".$d['marker']."'>".$d['folio']."</span>";
 												?>
 												<tr>
-												<td title="Ver Historial" id="id-logger" style="cursor: pointer; text-decoration: underline;"><?php echo $d['id_package']; ?></td>
+												<td data-toggle="tooltip" data-placement="top" title="Ver Historial" id="id-logger" style="cursor: pointer; text-decoration: underline;"><?php echo $d['id_package']; ?></td>
 												<td><?php echo $d['location_desc']; ?></td>
 												<td><?php echo $d['parcel_desc']; ?></td>
 												<td><?php echo $d['c_date']; ?></td>
@@ -288,7 +288,7 @@ $packages = $db->select($sql);
 												<td><?php echo $d['sms_by_user']; ?></td>
 												<td>
 													<?php if($d['t_sms_sent']==0){ echo "0";}else{ ?>
-														<span class="badge badge-pill badge-info" style="cursor: pointer;" id="btn-details" title="Ver"><?php echo $d['t_sms_sent']; ?></span>
+														<span class="badge badge-pill badge-info" style="cursor: pointer;" id="btn-details" data-toggle="tooltip" data-placement="top" title="Ver"><?php echo $d['t_sms_sent']; ?></span>
 													<?php
 													} ?>
 												</td>
@@ -297,7 +297,7 @@ $packages = $db->select($sql);
 												<td><?php echo $d['note']; ?></td>
 												<td>
 													<?php if($d['t_evidence']!=0){ ?>
-														<span class="badge badge-pill badge-warning" style="cursor: pointer;" id="btn-evidence" title="Evidencia(s)">
+														<span class="badge badge-pill badge-warning" style="cursor: pointer;" id="btn-evidence" data-toggle="tooltip" data-placement="top" title="Evidencia(s)">
 															<?php echo $d['t_evidence']; ?> <i class="fa fa-file-image-o fa-lg" aria-hidden="true"></i>
 														</span>
 													<?php

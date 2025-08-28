@@ -42,12 +42,13 @@
                     <ul class="user_profile_dd" style="display: <?php echo $display; ?>">
                         <li style="background-color: #03a9f4 !important;"> <!-- #15283c !important -->
                             <a class="dropdown-toggle" data-toggle="dropdown">
-                                <span class="name_user"><i class="fa fa-bars"></i> <?php echo $pagina;?></span>
+                                <span class="name_user"><i class="fa fa-bars"></i> <span id="name_user"><?php echo $pagina;?></span></span>
                             </a>
                             <div class="dropdown-menu">
                                 <?php
                                 if($pagina=='packages'){
                                 ?>
+                                    <a href="packages.php"><span>En ruta</span></a>
                                 	<a href="#" id="btn-add-package"><span>Nuevo paquete</span></a>
                                     <a href="#" id="btn-folio"><span>Folio</span></a>
                                     <a href="#" id="btn-ocurre"><span>Crear código barras</span></a>
@@ -96,8 +97,8 @@
             <div class="right_topbar">
                 <div class="icon_info">
                     <ul>
-                        <li><a href="#" id="btn-scan-qr"><i class="fa fa-qrcode"></i></a></li>
-                        <li><a href="#"><i class="fa fa-comments-o"></i><span class="badge online_animation">3</span></a></li>
+                        <li><a href="#" id="btn-scan-qr"><i class="fa fa-qrcode fa-lg"></i></a></li>
+                        <li><a href="#"><i class="fa fa-comments-o fa-lg"></i><span class="badge online_animation">3</span></a></li>
                     </ul>
                     <ul class="user_profile_dd">
                         <li>

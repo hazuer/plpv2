@@ -80,11 +80,19 @@
 html,
 body {
     color: #898989;
-    font-size: 14px;
     font-family: 'Poppins', sans-serif;
     line-height: normal;
     font-weight: 300;
     overflow-x: hidden !important;
+        font-size: 12px;
+    line-height: 1.42857;
+    padding-bottom: 50px;
+}
+
+@media only screen and (max-width: 768px) {
+    table.dataTable {
+        font-size: 9px; /* Reducción del tamaño de letra en un 25% */
+    }
 }
 
 body.demos .section {
@@ -300,7 +308,7 @@ a.btn {
 }
 
 .padding_infor_info {
-    padding: 35px 35px;
+    padding: 10px 10px;
     float: left;
     width: 100%;
 }
@@ -3248,7 +3256,7 @@ table.projects tr td:first-child {
 }
 
 .table-responsive-sm {
-    overflow: auto;
+    /*overflow: auto;*/
 }
 
 

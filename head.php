@@ -57,3 +57,13 @@
 <script src="<?php echo BASE_URL;?>/assets/js/libraries/sweetalert.min.js"></script>
 <script src="<?php echo BASE_URL;?>/assets/js/functions.js?version=<?php echo time();?>"></script>
 <script src="<?php echo BASE_URL;?>/assets/js/libraries/html5-qrcode.min.js"></script>
+
+<style>
+.container-fluid{
+  width: 100%;
+  padding-right: 0px !important;
+  padding-left: 0px !important;
+  margin-right: auto;
+  margin-left: auto;
+}
+</style>

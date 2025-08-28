@@ -53,7 +53,7 @@ if(isset($rParcel)){
                <!-- dashboard inner -->
                <div class="midde_cont">
                   <div class="container-fluid">
-                                        <div class="row column_title">
+                    <div class="row column_title">
                         <div class="col-md-12">
                            <div class="page_title">
                               <h2>Porcentaje de Entrega <?php echo date('F');?> <?php echo $desc_loc;?></h2>
