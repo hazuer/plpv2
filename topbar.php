@@ -48,8 +48,13 @@
                                 <?php
                                 if($pagina=='packages'){
                                 ?>
-                                    <a href="packages.php"><span>En ruta</span></a>
+                                    <a href="packages.php"><span>Paquetes</span></a>
                                 	<a href="#" id="btn-add-package"><span>Nuevo paquete</span></a>
+                                    <?php if($host==NAME_HOST_LOCAL){?>
+                                    <a href="#" id="btn-template"><span>Plantilla de bot</span></a>
+									<a href="#" id="btn-bot"><span>Crear bot</span></a>
+									<a href="handler.php"><span>Envio manual</span></a>
+                                    <?php }?>
                                     <a href="#" id="btn-folio"><span>Folio</span></a>
                                     <a href="#" id="btn-ocurre"><span>Crear código barras</span></a>
                                     <a href="#" id="btn-sync"><span>Guías no liberadas</span></a>
@@ -58,12 +63,9 @@
                                 if($pagina=='whatsapp'){
                                 ?>
                                  	<!--mesajes-->
-									<a href="#"><span>Mensajes nuevos</span></a>
+									<a href="whatsapp.php"><span>Mensajes nuevos</span></a>
 									<a href="#"><span>Plant. de whatsApp</span></a>
 									<a href="#"><span>Enviar whatsApp</span></a>
-									<a href="#"><span>Plantilla de bot</span></a>
-									<a href="#"><span>Crear bot</span></a>
-									<a href="#"><span>Envio manual</span></a>
                                 <?php
                                 }
                                  if($pagina=='reports' || $pagina=='reportspe'|| $pagina=='prereg' || $pagina=='audit'){
@@ -98,7 +100,7 @@
                 <div class="icon_info">
                     <ul>
                         <li><a href="#" id="btn-scan-qr"><i class="fa fa-qrcode fa-lg"></i></a></li>
-                        <li><a href="#"><i class="fa fa-comments-o fa-lg"></i><span class="badge online_animation">3</span></a></li>
+                        <li><a href="whatsapp.php"><i class="fa fa-comments-o fa-lg"></i><span class="badge online_animation"><?php echo $totalMensajeSinLeer;?></span></a></li>
                     </ul>
                     <ul class="user_profile_dd">
                         <li>

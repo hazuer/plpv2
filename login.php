@@ -16,7 +16,7 @@ if(isset($_SESSION["uActive"])){
 <html lang="es-MX">
       <head>
          <?php include_once('head.php');?>
-         <script src="<?php echo BASE_URL;?>/assets/js/login.js"></script>
+         <script src="<?php echo BASE_URL;?>/assets/js/login.js?version=<?php echo time(); ?>"></script>
       </head>
    <body class="inner_page login">
       <div class="full_container">

@@ -11,6 +11,22 @@ $txtchgval = ($_SESSION['uLocation']==2) ? 1:2;
 $protocol  = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://";
 // Host
 $host = $_SERVER['HTTP_HOST'];
+
+$patImg = 'user'; // valor por defecto
+switch ($_SESSION["uId"]) {
+    case 1:
+        $patImg = 'isi';
+        break;
+    case 2:
+        $patImg = 'karen';
+        break;
+    case 4:
+        $patImg = 'josue';
+        break;
+    default:
+        $patImg = 'user';
+        break;
+}
 ?>
 <nav id="sidebar" class="active" style="display: none;">
    <div class="sidebar_blog_1">
@@ -22,7 +38,7 @@ $host = $_SERVER['HTTP_HOST'];
       <div class="sidebar_user_info">
          <div class="icon_setting"></div>
          <div class="user_profle_side">
-            <div class="user_img"><img class="img-responsive" src="images/layout_img/user_img.jpg" alt="#" /></div>
+            <div class="user_img"><img class="img-responsive" src="images/layout_img/<?php echo $patImg; ?>.jpg" alt="#" /></div>
             <div class="user_info">
                <h6><?php echo $_SESSION["uName"];?></h6>
                <p><span class="online_animation"></span> Online</p>
@@ -37,7 +53,7 @@ $host = $_SERVER['HTTP_HOST'];
             <a href="dashboard.php"><i class="fa fa-home blue2_color"></i> <span>Dashboard</span></a>
          </li>
          <li>
-            <a href="packages.php"><i class="fa fa-cubes blue1_color"></i> <span>En ruta</span></a>
+            <a href="packages.php"><i class="fa fa-cubes blue1_color"></i> <span>Paquetes</span></a>
          </li>
          <li>
             <a href="whatsapp.php"><i class="fa fa-paper-plane green_color"></i> <span>WhatsApp</span></a>

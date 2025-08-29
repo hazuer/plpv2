@@ -104,7 +104,19 @@ $templateMsj = $user[0]['template'];
                 #lbl-title-location {
                     display: none;
                 }
-            }
+				table thead th {
+				vertical-align: middle !important; /* centra vertical */
+				text-align: center;                 /* centra horizontal (opcional) */
+				}
+				#tbl-packages_filter input[type="search"] {
+    width: 120px; /* o el tamaño que quieras */
+    font-size: 14px; /* opcional para reducir texto */
+  }
+
+  .dt-buttons .buttons-excel {
+    display: none !important;
+  }
+
 			div.swal-footer {
 				text-align: center !important;
 				padding: 0px 0px !important;

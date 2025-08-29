@@ -46,12 +46,41 @@ $tpm = 0;
 foreach ($rst as $item) {
     $tpm += intval($item['count']); // Convertir a entero antes de sumar
 }
+
+# total de paquetes
+$sql = "SELECT 
+p.id_package 
+FROM package p 
+WHERE 1 
+AND p.id_location IN ($id_location)
+AND p.id_status IN(1,2,5,6,7,8)";
+$tpackages = $db->select($sql);
+
+$sqlpre = "SELECT 
+p.id_package 
+FROM package_tmp p 
+WHERE 1 
+AND p.id_location IN ($id_location)";
+$tpre = $db->select($sqlpre);
 ?>
 <!DOCTYPE html>
 <html lang="es-MX">
     <head>
         <?php include_once('head.php');?>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+.counter_no:hover,
+.counter_no:hover .couter_icon {
+    transform: scale(1.05);
+}
+
+.counter_no:hover .couter_icon {
+    color: #007bff; /* ejemplo: cambia color del ícono */
+    transition: all 0.3s ease;
+}
+
+
+        </style>
     </head>
     <body class="dashboard dashboard_1">
         <div class="full_container">
@@ -71,47 +100,54 @@ foreach ($rst as $item) {
                             <div class="row column1">
                                 <div class="col-md-6 col-lg-4">
                                     <div class="full counter_section margin_bottom_30" style="display: block !important;">
-                                        <div class="couter_icon">
+                                    <a href="packages.php" class="counter_no">
+                                    <div class="couter_icon">
                                             <div> 
                                                 <i class="fa fa-cubes blue1_color"></i>
                                             </div>
                                         </div>
+                                        
                                         <div class="counter_no">
                                             <div>
-                                                <p class="total_no">123.50</p>
+                                                <p class="total_no"><?php echo $totalMensajeSinLeer; ?></p>
                                                 <p class="head_couter">Paquetes en ruta</p>
                                             </div>
                                         </div>
+                                        </a>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-lg-4">
                                     <div class="full counter_section margin_bottom_30" style="display: block !important;">
-                                        <div class="couter_icon">
+                                    <a href="prereg.php" class="counter_no">
+                                    <div class="couter_icon">
                                             <div> 
                                                 <i class="fa fa-cubes yellow_color"></i>
                                             </div>
                                         </div>
                                         <div class="counter_no">
                                             <div>
-                                                <p class="total_no">2500</p>
+                                                <p class="total_no"><?php echo count($tpre); ?></p>
                                                 <p class="head_couter">Paquetes sin rotular</p>
                                             </div>
                                         </div>
+                                        </a>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-lg-4">
                                     <div class="full counter_section margin_bottom_30" style="display: block !important;">
-                                        <div class="couter_icon">
+                                        <a href="whatsapp.php" class="counter_no">
+                                    <div class="couter_icon">
                                             <div>
                                                 <i class="fa fa-comments-o green_color"></i>
                                             </div>
                                         </div>
                                         <div class="counter_no">
                                             <div>
-                                                <p class="total_no">54</p>
+                                                <p class="total_no"><?php echo $totalMensajeSinLeer; ?></p>
                                                 <p class="head_couter">Mensajes nuevos</p>
                                             </div>
                                         </div>
+                                        </a>
                                     </div>
                                 </div>
                             </div>

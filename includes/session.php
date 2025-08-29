@@ -49,3 +49,13 @@ if(isset($_SESSION['uLocation'])){
 $desc_loc = ($_SESSION['uLocation']==1)? 'Tlaquiltenango':' Zacatepec';
 
 //var_dump($_SESSION);
+
+#contador de mensajes
+$sqlm="SELECT 
+    COUNT(DISTINCT sender_phone) AS total_chats 
+FROM 
+    waba_callbacks 
+WHERE 
+    is_read = 0";
+$rsttmsl  = $db->select($sqlm);
+$totalMensajeSinLeer = $rsttmsl[0]['total_chats'];

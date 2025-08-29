@@ -854,7 +854,7 @@ async function sendMessageWhats(client, chatId, fullMessage, iconBot) {
 
 		//handler emergency
 
-		$nombreArchivo = '../views/modal/handler.php';
+		$nombreArchivo = '../modal/handler.php';
 	$contenidoHTML='<div class="col-md-6">
 	<div class="form-group">
 		<div class="form-group">
