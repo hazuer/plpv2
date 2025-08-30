@@ -64,8 +64,7 @@
                                 ?>
                                  	<!--mesajes-->
 									<a href="whatsapp.php"><span>Mensajes nuevos</span></a>
-									<a href="#"><span>Plant. de whatsApp</span></a>
-									<a href="#"><span>Enviar whatsApp</span></a>
+									<a href="#" id="waba-template"><span>WABA</span></a>
                                 <?php
                                 }
                                  if($pagina=='reports' || $pagina=='reportspe'|| $pagina=='prereg' || $pagina=='audit'){
@@ -84,8 +83,9 @@
                                 if($pagina=='admin'){
 								?>
                                  <a href="admin.php"><span>Inventario</span></a>
-                                 <a href="dashboard.html"><span>Cambiar estatus</span></a>
-                                 <a href="dashboard.html"><span>Cambiar ubicación</span></a>
+                                 <a class="dropdown-item" href="#" id="option-location-2" data-slocation="<?php echo $txtchgval; ?>" data-slocationd="<?php echo $txtchg;?>"><span><?php echo $txtchg;?></span></a>
+                                 <!-- <a href="dashboard.html"><span>Cambiar estatus</span></a>
+                                 <a href="dashboard.html"><span>Cambiar ubicación</span></a> -->
                                  <?php 
 								}
 								?>

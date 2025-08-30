@@ -215,10 +215,30 @@ if ($phone) {
                                              <ul class="msg_list">
                                                 <?php
                                                 foreach ($chats as $chat) {
+                                                   $numero = substr($chat['sender_phone'], 3);
+
+                                                   $sqlGetContac="SELECT 
+                                                c.id_contact,
+                                                c.id_location,
+                                                c.phone,
+                                                c.contact_name,
+                                                c.id_contact_type,
+                                                ct.contact_type,
+                                                c.id_contact_status
+                                                FROM cat_contact c 
+                                                INNER JOIN cat_contact_type ct ON ct.id_contact_type = c.id_contact_type 
+                                                WHERE 
+                                                c.id_location IN ($id_location) 
+                                                AND c.phone IN('$numero')
+                                                ORDER BY c.c_date DESC LIMIT 1";
+                                                $rstCheck = $db->select($sqlGetContac);
+			                                       $contact_name = $rstCheck[0]['contact_name'] ?? 0;
+                                                $locId = $rstCheck[0]['id_location'] ?? 0;
+                                                // $ubicacion = ($locId==1)? 'Tlaquiltenango':' Zacatepec';
                                                    echo '
                                                    <li onclick="window.location.href=\'?phone='.$chat['sender_phone'].'\'" class="chat-item">
                                                       <span>
-                                                            <span class="name_user">'.$chat['sender_phone'].'</span>
+                                                            <span class="name_user">'.$contact_name.' '.$chat['sender_phone'].'</span>
                                                             <span class="msg_user">'.htmlspecialchars($chat['last_message']).'</span>
                                                             <span class="time_ago">'.date("H:i", strtotime($chat['last_date'])).'</span>
                                                       </span>
@@ -233,7 +253,7 @@ if ($phone) {
                               </div>
                            </div>
                         </div>
-<input type="hidden" id="tophone" value="<?php echo $phone;?>">
+                  <input type="hidden" id="tophone" value="<?php echo $phone;?>">
 						<!-- --------------- -->
                   <div class="col-md-8 chat-wrapper">
                      <div class="white_shd full margin_bottom_30" style="display: block !important;">
@@ -274,6 +294,7 @@ if ($phone) {
          </div>
       </div>
       <?php
+         require_once('modal/waba-template.php');
       	require_once('footer.php');
       ?>
    </body>

@@ -9,16 +9,16 @@ include('modal/info-guia.php');
 <script src="js/bootstrap.min.js"></script>-->
 
 <!-- wow animation -->
-<script src="js/animate.js"></script>
+<!-- <script src="js/animate.js"></script> -->
 <!-- select country -->
-<script src="js/bootstrap-select.js"></script>
+<!-- <script src="js/bootstrap-select.js"></script> -->
 <!-- owl carousel -->
-<script src="js/owl.carousel.js"></script> 
+<!-- <script src="js/owl.carousel.js"></script> -->
 <!-- chart js -->
-<script src="js/Chart.min.js"></script>
-<script src="js/Chart.bundle.min.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/analyser.js"></script>
+<!-- <script src="js/Chart.min.js"></script> -->
+<!-- <script src="js/Chart.bundle.min.js"></script> -->
+<!-- <script src="js/utils.js"></script> -->
+<!-- <script src="js/analyser.js"></script> -->
 <!-- nice scrollbar -->
 <!-- <script src="js/perfect-scrollbar.min.js"></script>-->
 <script>

@@ -16,6 +16,11 @@ $(document).ready(function() {
 			}
 		});
 	});
+	
+	$('.onclikload').on('click', function(e) {
+		loading();
+		$('.swal-button-container').hide();
+	});
 
   	$("#home").click(function(){
 		window.location.href = `${base_url}/views/packages.php`;
@@ -42,7 +47,7 @@ $(document).ready(function() {
 		})
 	});
 
-	$('#option-location-1').click(function(){
+	$('#option-location-1,#option-location-2').click(function(){
 		let formData = new FormData();
 		formData.append('id_location',$(this).data('slocation'));
 		let sdesc = $(this).data('slocationd');
@@ -229,6 +234,16 @@ $(document).ready(function() {
 		swal({
 			title            : title,
 			text             : textDesc,
+			icon             : `${base_url}/assets/img/ajax-loader.gif`,
+			showConfirmButton: false,
+			closeOnClickOutside: false
+		});
+	}
+	
+		const loading = () => {
+		swal({
+			title            : '',
+			text             : '',
 			icon             : `${base_url}/assets/img/ajax-loader.gif`,
 			showConfirmButton: false,
 			closeOnClickOutside: false

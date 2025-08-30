@@ -80,11 +80,11 @@
 html,
 body {
     color: black;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
     line-height: normal;
     font-weight: 300;
     overflow-x: hidden !important;
-        font-size: 12.5px;
+        font-size: 13px;
     line-height: 1.42857;
     padding-bottom: 50px;
 }
@@ -92,7 +92,7 @@ body {
 @media only screen and (max-width: 768px) {
     table.dataTable {
          color: black;
-        font-size: 9px; /* Reducción del tamaño de letra en un 25% */
+        font-size: 10px; /* Reducción del tamaño de letra en un 25% */
     }
 }
 

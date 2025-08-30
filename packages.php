@@ -109,13 +109,17 @@ $templateMsj = $user[0]['template'];
 				text-align: center;                 /* centra horizontal (opcional) */
 				}
 				#tbl-packages_filter input[type="search"] {
-    width: 120px; /* o el tamaño que quieras */
-    font-size: 14px; /* opcional para reducir texto */
-  }
+					width: 150px; /* o el tamaño que quieras */
+					font-size: 14px; /* opcional para reducir texto */
+				}
+				table.dataTable {
+					color: black;
+					font-size: 13px; /* Reducción del tamaño de letra en un 25% */
+				}
 
-  .dt-buttons .buttons-excel {
-    display: none !important;
-  }
+				.dt-buttons .buttons-excel {
+					display: none !important;
+				}
 
 			div.swal-footer {
 				text-align: center !important;
@@ -145,40 +149,51 @@ $templateMsj = $user[0]['template'];
 			#coincidencias p:hover {
 				background-color: #D4EDDA; /* Cambiar el color de fondo al pasar el cursor */
 			}
+		}
         </style>
         <script>
-			function truncateText() {
-				const table = document.getElementById('tbl-packages');
-				const rows = table.getElementsByTagName('tr');
+    /*function truncateText() {
+//        const table = document.getElementById('tbl-packages');
+        //if (!table) return; // Evita errores si la tabla no existe
 
-				for (let i = 1; i < rows.length; i++) { // Empezamos desde 1 para omitir el encabezado
-					const cells = rows[i].getElementsByTagName('td');
-					if (cells.length > 6) { // Asegúrate de que hay al menos 7 columnas
-						const cell = cells[6]; // La columna 7 tiene un índice de 6
-						const text = cell.innerText;
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length > 6) {
+                const cell = cells[6];
+                const text = cell.textContent.trim();
 
-						// Si el texto es más largo que 20 caracteres, truncarlo
-						if (text.length > 10) {
-							cell.innerText = text.substring(0, 10) + '...'; // Añadir "..." al final
-						}
-					}
-				}
-			}
+                if (text.length > 10 && !cell.dataset.truncated) {
+                    cell.textContent = text.substring(0, 10) + '...';
+                    cell.dataset.truncated = "true"; // Evita truncar varias veces
+                }
+            }
+        });
+    }*/
 
-			// Ejecutar la función al cargar la página
-			window.onload = function() {
-				if (window.innerWidth <= 768) {
-					truncateText();
-				}
-			};
+    //let lastWidth = window.innerWidth;
+    //let resizeTimer;
 
-			// También ejecuta la función al redimensionar la ventana
-			window.onresize = function() {
-				if (window.innerWidth <= 768) {
-					truncateText();
-				}
-			};
-		</script>
+    // Ejecuta al cargar
+    /*document.addEventListener('DOMContentLoaded', () => {
+        if (window.innerWidth <= 768) {
+            //truncateText();
+        }
+    });*/
+
+    // Optimiza el evento resize
+    /*window.addEventListener('resize', function() {
+        if (Math.abs(window.innerWidth - lastWidth) > 50) { // Solo si cambia más de 50px
+            lastWidth = window.innerWidth;
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (window.innerWidth <= 768) {
+                    //truncateText();
+                }
+            }, 200);
+        }
+    });*/
+</script>
       </head>
 	<body class="dashboard dashboard_1">
       <div class="full_container">
@@ -303,6 +318,9 @@ $templateMsj = $user[0]['template'];
             </div>
          </div>
       </div>
+	  <audio id="sound-snap" style="display: none;">
+		<source src="<?php echo BASE_URL;?>/assets/snap.mp3" type="audio/mpeg">
+	</audio>
       <?php
 		include('modal/folio.php');
 		include('modal/template.php');

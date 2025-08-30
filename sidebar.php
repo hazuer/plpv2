@@ -41,7 +41,7 @@ switch ($_SESSION["uId"]) {
             <div class="user_img"><img class="img-responsive" src="images/layout_img/<?php echo $patImg; ?>.jpg" alt="#" /></div>
             <div class="user_info">
                <h6><?php echo $_SESSION["uName"];?></h6>
-               <p><span class="online_animation"></span> Online</p>
+               <p><?php echo $desc_loc?></p>
             </div>
          </div>
       </div>
@@ -50,22 +50,22 @@ switch ($_SESSION["uId"]) {
       <h4>Panel</h4>
       <ul class="list-unstyled components">
          <li>
-            <a href="dashboard.php"><i class="fa fa-home blue2_color"></i> <span>Dashboard</span></a>
+            <a href="dashboard.php" class="onclikload"><i class="fa fa-home blue2_color"></i> <span>Dashboard</span></a>
          </li>
          <li>
-            <a href="packages.php"><i class="fa fa-cubes blue1_color"></i> <span>Paquetes</span></a>
+            <a href="packages.php" class="onclikload"><i class="fa fa-cubes blue1_color"></i> <span>Paquetes</span></a>
          </li>
          <li>
-            <a href="whatsapp.php"><i class="fa fa-paper-plane green_color"></i> <span>WhatsApp</span></a>
+            <a href="whatsapp.php" class="onclikload"><i class="fa fa-paper-plane green_color"></i> <span>WhatsApp</span></a>
          </li>
 		 <li>
-            <a href="reports.php"><i class="fa fa-bar-chart purple_color"></i> <span>Reportes</span></a>
+            <a href="reports.php" class="onclikload"><i class="fa fa-bar-chart purple_color"></i> <span>Reportes</span></a>
          </li>
          <li>
-            <a href="contacts.php"><i class="fa fa-users red_color"></i> <span>Contactos</span></a>
+            <a href="contacts.php" class="onclikload"><i class="fa fa-users red_color"></i> <span>Contactos</span></a>
          </li>
          <li>
-            <a href="admin.php"><i class="fa fa-dashboard  yellow_color"></i> <span>Admin</span></a>
+            <a href="admin.php" class="onclikload"><i class="fa fa-dashboard  yellow_color"></i> <span>Admin</span></a>
          </li>
          <li>
 			<a href="#" id="logoff"><i class="fa fa-sign-out orange_color"></i> <span>Salir</span></a>

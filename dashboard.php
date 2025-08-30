@@ -109,7 +109,7 @@ $tpre = $db->select($sqlpre);
                                         
                                         <div class="counter_no">
                                             <div>
-                                                <p class="total_no"><?php echo $totalMensajeSinLeer; ?></p>
+                                                <p class="total_no"><?php echo count($tpackages); ?></p>
                                                 <p class="head_couter">Paquetes en ruta</p>
                                             </div>
                                         </div>
