@@ -17,7 +17,7 @@ $(document).ready(function() {
             url: "https://graph.facebook.com/v19.0/683077594899877/messages",
             method: "POST",
             headers: {
-                "Authorization": "Bearer EAAYTcZCLS2AABPfHbZCFMSbJn4ZAFLl2cg2YZBqvZBZA4ALnd3vKcLB1UPDwCnaBs5lcXEDHOk4sFcFqAFydAyACGvQPtrVv8030CBPu2OSjwIlU13YBPZCyljubi0ZCNKXbbTrmYZAnO65WLXTHNg9tFDfSVOkZA4YZCQU8DiKtj3DdtfZBXZA8cJVNjReM2AEuh2BtXtiubpCIRBZAbhvplNUNAsXlw9ZAbhKppCqSCoNdEK3",
+                "Authorization": "Bearer EAAYTcZCLS2AABPWBNEmHaeUcQMoHC8M3XfB2l9rrSHECsZB66Fo5X1M8h1giJDx4VoOZBZBYKrwjSpoBspaM7sgE31BLBqvXROCI34SFZBZBfcSIABALLmlyZApk7NcZCQgR8fpRLVXfLiXqj2AkQ4LdFFM02hlNqaM3H1rYr6pKuYyQyEqv8uhq1WaZBIQHNRXZCAzc6wju4cYilVVNpZAoHdLKeeZARynpST4mu94dUXANvG0YGQZDZD",
                 "Content-Type": "application/json"
             },
             data: JSON.stringify({

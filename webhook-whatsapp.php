@@ -38,42 +38,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($data['entry'][0]['changes'][0]['value']['messages'][0])) {
         $message = $data['entry'][0]['changes'][0]['value']['messages'][0];
 
-        // Extraer datos del mensaje
+        // Extraer datos básicos
         $from        = $message['from'] ?? '';
         $message_id  = $message['id'] ?? '';
-        $body        = $message['text']['body'] ?? '';
+        $type        = $message['type'] ?? '';
         $raw_json    = $input;
+
+        // Determinar el contenido según tipo de mensaje
+        $body = '';
+        switch($type) {
+            case 'text':
+                $body = $message['text']['body'];
+                break;
+
+            case 'image':
+                $body = '[IMAGE] ID: ' . ($message['image']['id'] ?? '');
+                break;
+
+            case 'audio':
+                $body = '[AUDIO] ID: ' . ($message['audio']['id'] ?? '');
+                break;
+
+            case 'document':
+                $body = '[DOCUMENT] ID: ' . ($message['document']['id'] ?? '');
+                break;
+
+            default:
+                $body = '[UNSUPPORTED TYPE] ' . $type;
+                break;
+        }
 
         // Validar datos mínimos antes de insertar
         if (!empty($from) && !empty($message_id)) {
-            define( '_VALID_MOS', 1 );
-
+            define('_VALID_MOS', 1);
             date_default_timezone_set('America/Mexico_City');
-            
-            require_once('includes/configuration.php');
-            require_once('includes/DB.php');
-            $db = new DB(HOST,USERNAME,PASSWD,DBNAME,PORT,SOCKET);
-            // Construcción del array
-            $dataLog = [
-                'id_log'       => null,
-                'datelog'      => date("Y-m-d H:i:s"),
-                'sender_phone' => $from,
-                'message_id'   => $message_id,
-                'message_text' => $body,
-                'raw_json'     => $raw_json
-            ];
 
+            require_once('includes/configuration.php');
+            require_once('includes/DBW.php');
+            $db = new DB(HOST, USERNAME, PASSWD, DBNAME, PORT, SOCKET);
+
+            // Escapar valores para evitar SQL injection y errores de caracteres
+            $date           = date("Y-m-d H:i:s");
+            // Sentencia SQL directa
+            $sql = "
+                INSERT INTO waba_callbacks (datelog, sender_phone, message_id, message_text, raw_json)
+                VALUES ('$date', '$from', '$message_id', '$body', '$raw_json')
+            ";
             try {
                 // Insertar en base de datos
-                $db->insert('waba_callbacks', $dataLog);
+                $db->sqlPure($sql, false);
 
                 // Log adicional para confirmar inserción
-                file_put_contents('webhook_log.txt', "INSERT OK: $from - $body" . PHP_EOL, FILE_APPEND);
+                file_put_contents('webhook_logok.txt', "INSERT OK: $from - $body" . PHP_EOL, FILE_APPEND);
             } catch (Exception $e) {
-                file_put_contents('webhook_log.txt', "DB ERROR: " . $e->getMessage() . PHP_EOL, FILE_APPEND);
+                file_put_contents('webhook_logerror.txt', "DB ERROR: " . $e->getMessage() . PHP_EOL, FILE_APPEND);
             }
         } else {
-            file_put_contents('webhook_log.txt', "Datos incompletos: " . print_r($message, true) . PHP_EOL, FILE_APPEND);
+            file_put_contents('webhook_logelse.txt', "Datos incompletos: " . print_r($message, true) . PHP_EOL, FILE_APPEND);
         }
     }
 
@@ -85,3 +106,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Si no es GET ni POST
 http_response_code(404);
 echo "Not Found";
+?>

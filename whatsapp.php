@@ -3,7 +3,7 @@ session_start();
 define( '_VALID_MOS', 1 );
 
 require_once('includes/configuration.php');
-require_once('includes/DB.php');
+require_once('includes/DBW.php');
 $db = new DB(HOST,USERNAME,PASSWD,DBNAME,PORT,SOCKET);
 require_once('includes/session.php');
 $id_location = $_SESSION['uLocation'];
@@ -215,34 +215,50 @@ if ($phone) {
                                              <ul class="msg_list">
                                                 <?php
                                                 foreach ($chats as $chat) {
-                                                   $numero = substr($chat['sender_phone'], 3);
+                                                    $numero = substr($chat['sender_phone'], 3);
 
-                                                   $sqlGetContac="SELECT 
-                                                c.id_contact,
-                                                c.id_location,
-                                                c.phone,
-                                                c.contact_name,
-                                                c.id_contact_type,
-                                                ct.contact_type,
-                                                c.id_contact_status
-                                                FROM cat_contact c 
-                                                INNER JOIN cat_contact_type ct ON ct.id_contact_type = c.id_contact_type 
-                                                WHERE 
-                                                c.id_location IN ($id_location) 
-                                                AND c.phone IN('$numero')
-                                                ORDER BY c.c_date DESC LIMIT 1";
-                                                $rstCheck = $db->select($sqlGetContac);
-			                                       $contact_name = $rstCheck[0]['contact_name'] ?? 0;
-                                                $locId = $rstCheck[0]['id_location'] ?? 0;
-                                                // $ubicacion = ($locId==1)? 'Tlaquiltenango':' Zacatepec';
-                                                   echo '
-                                                   <li onclick="window.location.href=\'?phone='.$chat['sender_phone'].'\'" class="chat-item">
-                                                      <span>
-                                                            <span class="name_user">'.$contact_name.' '.$chat['sender_phone'].'</span>
-                                                            <span class="msg_user">'.htmlspecialchars($chat['last_message']).'</span>
-                                                            <span class="time_ago">'.date("H:i", strtotime($chat['last_date'])).'</span>
-                                                      </span>
-                                                   </li>';
+                                                    $sqlGetContac="SELECT 
+                                                    c.id_contact,
+                                                    c.id_location,
+                                                    c.phone,
+                                                    c.contact_name,
+                                                    c.id_contact_type,
+                                                    ct.contact_type,
+                                                    c.id_contact_status
+                                                    FROM cat_contact c 
+                                                    INNER JOIN cat_contact_type ct ON ct.id_contact_type = c.id_contact_type 
+                                                    WHERE 
+                                                    c.id_location IN ($id_location) 
+                                                    AND c.phone IN('$numero')
+                                                    AND c.id_contact_status IN (1)
+                                                    ORDER BY c.c_date DESC LIMIT 1";
+                                                    $rstCheck = $db->select($sqlGetContac);
+    			                                    $contact_name = $rstCheck[0]['contact_name'] ?? 0;
+                                                    $locId = $rstCheck[0]['id_location'] ?? 0;
+                                                    // $ubicacion = ($locId==1)? 'Tlaquiltenango':' Zacatepec';
+                                                    if($locId==$id_location){
+                                                         echo '
+                                                       <li onclick="window.location.href=\'?phone='.$chat['sender_phone'].'\'" class="chat-item">
+                                                          <span>
+                                                                <span class="name_user">'.$contact_name.'<br>'.$numero.'</span>
+                                                                <span class="msg_user">'.htmlspecialchars($chat['last_message']).'</span>
+                                                                <span class="time_ago">'.date("H:i", strtotime($chat['last_date'])).'</span>
+                                                          </span>
+                                                       </li>';
+                                                    }else{
+                                                        /*
+                                                        echo $sqlGetContac;
+                                                        echo '
+                                                       <li onclick="window.location.href=\'?phone='.$chat['sender_phone'].'\'" class="chat-item">
+                                                          <span>
+                                                                <span class="name_user" style="color:red;">'.$numero.'</span>
+                                                                <span class="msg_user">'.htmlspecialchars($chat['last_message']).'</span>
+                                                                <span class="time_ago">'.date("H:i", strtotime($chat['last_date'])).'</span>
+                                                          </span>
+                                                       </li>';
+                                                       */
+                                                       //TODO::revisar numeros
+                                                    }
                                                 }
                                                 ?>
                                              </ul>

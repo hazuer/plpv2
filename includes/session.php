@@ -25,7 +25,7 @@ $dtstkn  = $db->select($sql);
 $tokenDB = $dtstkn[0]['session_token'];
 
 if (empty($_SESSION['session_token']) || $_SESSION['session_token'] !== $tokenDB) {
-	session_unset();
+	/*session_unset();
 	session_destroy();
 	//destro cookies
 	setcookie('uId', '', time() - 3600, '/');
@@ -39,6 +39,7 @@ if (empty($_SESSION['session_token']) || $_SESSION['session_token'] !== $tokenDB
 
 	header('Location: '.BASE_URL.'/login.php');
 	die();
+	*/
 }
 
 if(isset($_SESSION['uLocation'])){

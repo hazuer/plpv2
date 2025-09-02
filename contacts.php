@@ -130,11 +130,14 @@ $contacts = $db->select($sql);
 												<th>id_type_mode</th>
 												<th>id_contact_status</th>
 												<th>desc_estatus</th>
+												<th>ubicacion</th>
 												<th>Opciones</th>
 											</tr>
 										</thead>
 										<tbody>
-											<?php foreach($contacts as $d): ?>
+											<?php foreach($contacts as $d):
+											$ubicacion = ($d['id_location']==1)? 'Tlaquiltenango':' Zacatepec';
+											?>
 												<tr>
 												<td><?php echo $d['id_contact']; ?></td>
 												<td><?php echo $d['id_location']; ?></td>
@@ -147,6 +150,7 @@ $contacts = $db->select($sql);
 												<td><?php echo $d['id_type_mode']; ?></td>
 												<td><?php echo $d['id_contact_status']; ?></td>
 												<td><?php echo $d['desc_estatus']; ?></td>
+												<td><?php echo $ubicacion ?></td>
 												<td style="text-align: center;">
 													<div class="row">
 														<div class="col-md-12">

@@ -1,7 +1,12 @@
 <?php
 session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+#error_reporting(E_ALL);
+#ini_set('display_errors', '1');
+// Cambia el límite de ejecución a 600 segundos (10 minutos)
+ini_set('max_execution_time', 800);
+set_time_limit(800);
+ini_set('memory_limit', '512M');
+
 
 define( '_VALID_MOS', 1 );
 
@@ -47,7 +52,7 @@ switch ($_POST['option']) {
 		// Unir los números de teléfono en un solo string con comas
 		#var_dump($numeros_de_telefono);
 			foreach ($numeros_de_telefono as $number) {
-			$delay = rand(3, 5);
+			$delay = rand(1, 2);
     		sleep($delay);
 			$sql ="SELECT 
 			cc.phone,
@@ -114,7 +119,7 @@ switch ($_POST['option']) {
 					//}
 				}*/
 				$url = "https://graph.facebook.com/v23.0/683077594899877/messages";
-				$token = "EAAYTcZCLS2AABPaC8rOfvszXWTUsM067gN1UJ2ZBM5IsgZBslch2YHrvvXAy143d5u4vMZCfFpAXRnqKiZAOueuGVxEiZBQ72cnodzjH1jCEfWOztZATQQWGfat9KnrnTbRjqD49wuUiWV1L9WAn4SLvdK7g2c67ZCu5NpihosXU6249wWwqGt3HT0flDvT603fKDjCGcqWzpbXYu4NjG2cs7N0FwHzTDnQXwaZAZA";
+				$token = "EAAYTcZCLS2AABPWBNEmHaeUcQMoHC8M3XfB2l9rrSHECsZB66Fo5X1M8h1giJDx4VoOZBZBYKrwjSpoBspaM7sgE31BLBqvXROCI34SFZBZBfcSIABALLmlyZApk7NcZCQgR8fpRLVXfLiXqj2AkQ4LdFFM02hlNqaM3H1rYr6pKuYyQyEqv8uhq1WaZBIQHNRXZCAzc6wju4cYilVVNpZAoHdLKeeZARynpST4mu94dUXANvG0YGQZDZD";
 
 				$data = [
 					"messaging_product" => "whatsapp",

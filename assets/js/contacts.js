@@ -47,11 +47,12 @@ $(document).ready(function() {
 			{title: `Modo Registro`,    name:`tipo_modo`,        data:`tipo_modo`},         //7
 			{title: `id_type_mode`,     name:`id_type_mode`,     data:`id_type_mode`},      //8
 			{title: `id_contact_status`,name:`id_contact_status`,data:`id_contact_status`}, //9
-			{title: `Estatus`,          name:`desc_estatus`,     data:`desc_estatus`},      //10+ 1 last
+			{title: `Estatus`,          name:`desc_estatus`,     data:`desc_estatus`},      //10
+			{title: `Ubicacion`,        name:`ubicacion`,        data:`ubicacion`},      //11+ 1 last
 		],
 		"columnDefs": [
 			{ "targets": [0,1,4,8,9], "visible"   : false, "searchable": false, "orderable": false},
-			{ "orderable": false,"targets": 11 }, // last
+			{ "orderable": false,"targets": 12 }, // last
 		],
         'order': [[6, 'desc']]
 	});
