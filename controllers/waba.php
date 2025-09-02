@@ -1,7 +1,7 @@
 <?php
 session_start();
-#error_reporting(E_ALL);
-#ini_set('display_errors', '1');
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 // Cambia el límite de ejecución a 600 segundos (10 minutos)
 ini_set('max_execution_time', 800);
 set_time_limit(800);
@@ -35,25 +35,25 @@ switch ($_POST['option']) {
 		$field6=$_POST['field6'];
 
 		$idParceIn   = ($mbIdCatParcel==99) ? '1,2,3': $mbIdCatParcel;
-		$plb  = $_POST['mBListTelefonos'];
-		$lineas = explode("\n", $plb);
+		$number = $_POST['number']; // Solo un número
+
+		//$plb  = $_POST['mBListTelefonos'];
+		//$lineas = explode("\n", $plb);
 
 		$n_user_id=$_SESSION["uId"];
 
 		// Iterar sobre cada línea y limpiarla (eliminar espacios y comillas)
-		$numeros_de_telefono = [];
+		/*$numeros_de_telefono = [];
 		foreach ($lineas as $linea) {
 			$numero = trim(str_replace('"', '', $linea));
 			if (!empty($numero)) {
 				$numeros_de_telefono[] = $numero;
 			}
-		}
+		}*/
 
 		// Unir los números de teléfono en un solo string con comas
 		#var_dump($numeros_de_telefono);
-			foreach ($numeros_de_telefono as $number) {
-			$delay = rand(1, 2);
-    		sleep($delay);
+			//foreach ($numeros_de_telefono as $number) {
 			$sql ="SELECT 
 			cc.phone,
 			cc.id_contact_type,
@@ -69,7 +69,7 @@ switch ($_POST['option']) {
 			GROUP BY cc.phone";
 			$rst = $db->select($sql);
 
-			#var_dump($rst);
+			//var_dump($rst);
 			
 			if(count($rst)>0){
 			$ids               = $rst[0] ? $rst[0]['ids'] : 0;
@@ -77,7 +77,7 @@ switch ($_POST['option']) {
 			$folioGuias    = $rst[0] ? $rst[0]['folioGuias'] : 0;
 			#$fullMessage   = "{message}";
 			$sid = "";
-			$totalRegistros=count($rst);
+			$totalRegistros=count($folioGuias);
 			$tguias="Total:".$totalRegistros.", Folio y guías ".$folioGuias;
 				
 				/*let registros = folioGuias ? folioGuias.split('\n').filter(Boolean) : [];
@@ -211,12 +211,8 @@ switch ($_POST['option']) {
 				}
 			
 			}
-		}
-		$result = [
-				'success'  => true,
-				'dataJson' => [],
-				'message'  => 'Proceso Fializado'
-			];
-			echo json_encode($result);
+		//}
+		    echo json_encode(['success' => true, 'message' => "Mensaje enviado a $number"]);
+
 	break;
 }

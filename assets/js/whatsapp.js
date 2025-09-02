@@ -80,81 +80,79 @@ Te compartimos los datos de tu pedido: folios_db.
     // Eventos para actualizar en tiempo real
     $("#field2, #field3, #field4, #field5, #field6").on("input change", actualizarPreview);
 
+    $("#btn-send-template").on("click", function () {
+    const numeros = $("#mBListTelefonos").val().trim().split("\n").filter(n => n !== "");
+    const total = numeros.length;
 
-
-$("#btn-send-template").on("click", function() {
-    // Campos a validar
-    const mBEstatus = $("#mBEstatus").val();
-    const mbIdCatParcel = $("#mbIdCatParcel").val();
-    const mBListTelefonos = $("#mBListTelefonos").val().trim();
-    const field2 = $("#field2").val().trim();
-    const field3 = $("#field3").val().trim();
-    const field4 = $("#field4").val().trim();
-    const field5 = $("#field5").val().trim();
-    const field6 = $("#field6").val().trim();
-
-    let errores = [];
-
-    // Validación
-    if(mBEstatus === "99" || mBEstatus === "") errores.push("Estatus del Paquete");
-    if( mbIdCatParcel === "") errores.push("Paquetería");
-    if(mBListTelefonos === "") errores.push("Lista de Teléfonos");
-    if(field2 === "") errores.push("Ubicación");
-    if(field3 === "") errores.push("Hora Hoy");
-    if(field4 === "") errores.push("Hora Mañana");
-    if(field5 === "") errores.push("Fecha Devolución");
-    if(field6 === "") errores.push("Hora Devolución");
-
-    if(errores.length > 0){
-        swal("Atención!", "* Campos requeridos:\n" + errores.join(", "), "error");
+    if (total === 0) {
+        swal("Atención!", "Lista de Teléfonos vacía", "error");
         return;
     }
 
-    // Si pasa la validación, continúa con tu lógica (ej. guardar)
-    console.log("Validación correcta, puedes continuar...");
+    // SweetAlert con barra de progreso dentro
+    swal({
+        title: "Enviando mensajes...",
+        content: {
+            element: "div",
+            attributes: {
+                innerHTML: `
+                    <div style="width:100%;border:1px solid #ccc;border-radius:5px;">
+                        <div id="progress-bar" style="width:0%;background:#28a745;height:20px;border-radius:5px;"></div>
+                    </div>
+                    <p id="progress-text" style="margin-top:10px;">0 de ${total}</p>
+                `
+            }
+        },
+        buttons: false,
+        closeOnClickOutside: false,
+        closeOnEsc: false
+    });
 
+    let index = 0;
 
-		let formData =  new FormData();
-		formData.append('id_location', idLocationSelected.val());
+    function enviarSiguiente() {
+        if (index >= total) {
+            swal("¡Proceso completado!", `${total} mensajes enviados correctamente.`, "success");
+            return;
+        }
 
-        formData.append('mBEstatus',mBEstatus);
-        formData.append('mbIdCatParcel',mbIdCatParcel);
-        formData.append('mBListTelefonos',mBListTelefonos);
-        formData.append('field2',field2);
-        formData.append('field3',field3);
-        formData.append('field4',field4);
-        formData.append('field5',field5);
-        formData.append('field6',field6);
-		formData.append('option', 'sendTemplate');
-		try {
-			$.ajax({
-				url        : `${base_url}/${baseController}`,
-				type       : 'POST',
-				data       : formData,
-				cache      : false,
-				contentType: false,
-				processData: false,
-				beforeSend : function() {
-					showSwal('Enviado mensajes','Espere por favor...');
-					$('.swal-button-container').hide();
-				}
-			})
-			.done(function(response) {
-				swal.close();
-				if(response.success=='true'){
-					swal(`${response.message}`, "", "success");
-					$('.swal-button-container').hide();
-					$('#modal-template').modal('hide');
-					setTimeout(function(){
-						swal.close();
-						window.location.reload();
-					}, 1500);
-				}
-			}).fail(function(e) {
-				console.log("Opps algo salio mal",e);
-			});
-		} catch (error) {
-			console.error(error);
-		}
-	});
+        const numero = numeros[index];
+
+        let formData = new FormData();
+        formData.append('id_location', idLocationSelected.val());
+        formData.append('mBEstatus', $("#mBEstatus").val());
+        formData.append('mbIdCatParcel', $("#mbIdCatParcel").val());
+        formData.append('field2', $("#field2").val());
+        formData.append('field3', $("#field3").val());
+        formData.append('field4', $("#field4").val());
+        formData.append('field5', $("#field5").val());
+        formData.append('field6', $("#field6").val());
+        formData.append('number', numero);
+        formData.append('option', 'sendTemplate');
+
+        $.ajax({
+            url: `${base_url}/${baseController}`,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                index++;
+                let porcentaje = Math.round((index / total) * 100);
+                $("#progress-bar").css("width", porcentaje + "%");
+                $("#progress-text").text(`${index} de ${total}`);
+                enviarSiguiente(); // Llamar al siguiente
+            },
+            error: function () {
+                index++;
+                $("#progress-text").text(`${index} de ${total} (Error)`);
+                enviarSiguiente();
+            }
+        });
+    }
+
+    enviarSiguiente();
+});
+
 });
