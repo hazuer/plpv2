@@ -18,7 +18,7 @@ $db = new DB(HOST,USERNAME,PASSWD,DBNAME,PORT,SOCKET);
 
 header('Content-Type: application/json; charset=utf-8');
 $token = "EAAYTcZCLS2AABPQAZAjzSVPZBZAUCSSgqZAZCXODZAyFySyAN10SIL6BluwAW2VvvFrmPJIixawChknpxW9P5bjXeDC4ZBsAvhpxQIqi4mCRZAPM3ir1E3vOecLZCFhhHN6tQCaiZBYKHoOWR6orZAGgN20n017ZCXvpkVAfW4pGg4HIu1AqpfVEO8tkW04pVYMpk2wHmco3fHHp3kkM1ljZCPyyADoVKn6dFfwhRsZCuiq";
-$sender_phone='5217344093961';
+$wabaPhone='5217344093961';
 switch ($_POST['option']) {
 	case 'sendTemplate':
 		$result   = [];
@@ -209,11 +209,25 @@ switch ($_POST['option']) {
 			exit;
 		}
 
-		$sql = "SELECT message_text, datelog, sender_phone
+		/*$sql = "SELECT message_text, datelog, sender_phone
 			FROM waba_callbacks
 			WHERE sender_phone = '$phone'
 			ORDER BY datelog ASC";
-			$mensajes = $db->select($sql);
+			$mensajes = $db->select($sql);*/
+			$sql="SELECT 
+    id_log,
+    datelog,
+    sender_phone,
+    message_text,
+    CASE 
+        WHEN sender_phone = '".$wabaPhone."' THEN 'outgoing' 
+        ELSE 'incoming' 
+    END AS message_type 
+FROM waba_callbacks 
+WHERE sender_phone = '".$wabaPhone."' 
+   OR (sender_phone = '".$phone."' AND raw_json LIKE '%".$wabaPhone."%') 
+ORDER BY datelog ASC";
+$mensajes = $db->select($sql);
 
 		// Marcar como leídos
 		$sql = "UPDATE waba_callbacks 
@@ -265,19 +279,34 @@ switch ($_POST['option']) {
 			}
 
 			$decoded = json_decode($response, true);
-			if (isset($decoded['messages'])) {
-					$dataLog = [
+			// var_dump($decoded); // Para debug, puedes quitarlo en producción
+
+			if (isset($decoded['messages'][0]['id'])) {
+				$message_id = $decoded['messages'][0]['id']; // ID que regresa la API
+				$raw_json = json_encode($decoded, JSON_UNESCAPED_UNICODE); // Guardar como JSON string
+
+				$dataLog = [
 					'id_log'       => null,
 					'datelog'      => date("Y-m-d H:i:s"),
-					'sender_phone' => $sender_phone,
-					'message_id'   => 0,
+					'sender_phone' => $wabaPhone, // Tu número WABA
+					'message_id'   => $message_id,
 					'message_text' => $msj,
-					'raw_json'     => $decoded
+					'raw_json'     => $raw_json,
+					'is_read'      => 1, // Ya leído porque lo enviaste
+					'read_at'      => date("Y-m-d H:i:s"),
+					'read_by'      => 'system'
 				];
-				$db->insert('waba_callbacks', $dataLog);
-				echo json_encode(['success' => true, 'data' => $decoded]);
+
+				$inserted = $db->insert('waba_callbacks', $dataLog);
+
+				if ($inserted) {
+					echo json_encode(['success' => true, 'data' => $decoded]);
+				} else {
+					echo json_encode(['success' => false, 'message' => 'Error al guardar en DB']);
+				}
 			} else {
 				echo json_encode(['success' => false, 'message' => 'Error al enviar mensaje', 'response' => $decoded]);
 			}
+
 	break;
 }

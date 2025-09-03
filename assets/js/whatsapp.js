@@ -178,7 +178,8 @@ $(document).on('click', '.chat-item', function() {
                 console.log('ok mensajes');
                 mensajes.forEach(msg => {
                     console.log(msg);
-                    let tipo = (msg.sender_phone === '7344093961') ? 'sent' : 'received';
+                    const myNumber = '5217344093961'; // tu número WABA
+                let tipo = (msg.sender_phone === myNumber) ? 'sent' : 'received';
                     let hora = new Date(msg.datelog.replace(' ', 'T')).toLocaleTimeString([], {
                         hour: '2-digit',
                         minute: '2-digit'

@@ -154,6 +154,32 @@ $chats = $db->select($sql);
     border-radius: 4px;
 }
 
+.chat-bubble {
+    max-width: 70%;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 8px;
+    display: inline-block;
+    position: relative;
+}
+.sent {
+    background-color: #dcf8c6;
+    text-align: right;
+    margin-left: auto;
+}
+.received {
+    background-color: #fff;
+    text-align: left;
+    margin-right: auto;
+    border: 1px solid #ccc;
+}
+.time {
+    font-size: 10px;
+    color: #888;
+    display: block;
+    text-align: right;
+}
+
 		</style>
       </head>
 	<body class="dashboard dashboard_1">
