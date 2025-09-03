@@ -22,30 +22,9 @@ WHERE
 GROUP BY 
     sender_phone 
 ORDER BY 
-    last_date DESC;";
+    last_date DESC LIMIT 5;";
 $chats = $db->select($sql);
-
-
-$phone = $_GET['phone'] ?? '';
-$waba_number = '7344093961'; // tu número de WhatsApp Business
-$mensajes = [];
-if ($phone) {
-    $sql = "SELECT message_text, datelog, sender_phone
-   FROM waba_callbacks
-   WHERE sender_phone = '$phone'
-   ORDER BY datelog ASC";
-    $mensajes= $db->select($sql);
-}
-
-if ($phone) {
-   $sql = "UPDATE waba_callbacks 
-   SET is_read = 1, 
-         read_at = '" . date("Y-m-d H:i:s") . "', 
-         read_by = " . intval($_SESSION['uId']) . " 
-   WHERE sender_phone = '" .$phone . "'
-   AND is_read = 0";
-    $db->sqlPure($sql, false);
-}
+#var_dump($chats);
 ?>
 <!DOCTYPE html>
 <html lang="es-MX">
@@ -194,7 +173,7 @@ if ($phone) {
                      <div class="row column_title">
                         <div class="col-md-12">
                            <div class="page_title">
-                              <h2>Mensajes nuevos</h2>
+                              <h2>Mensajes nuevos <?php echo $id_location;?></h2>
                            </div>
                         </div>
                      </div>
@@ -212,88 +191,52 @@ if ($phone) {
                                     <div class="col-md-12">
                                        <div class="msg_section">
                                           <div class="msg_list_main">
-                                             <ul class="msg_list">
-                                                <?php
-                                                foreach ($chats as $chat) {
-                                                    $numero = substr($chat['sender_phone'], 3);
-
-                                                    $sqlGetContac="SELECT 
-                                                    c.id_contact,
-                                                    c.id_location,
-                                                    c.phone,
-                                                    c.contact_name,
-                                                    c.id_contact_type,
-                                                    ct.contact_type,
-                                                    c.id_contact_status
+                                          <ul class="msg_list" id="chat-list">
+                                             <?php foreach ($chats as $chat): 
+                                             $numero = substr($chat['sender_phone'], 3);
+                                               /*$sqlGetContac="SELECT 
+                                                    c.id_location
                                                     FROM cat_contact c 
-                                                    INNER JOIN cat_contact_type ct ON ct.id_contact_type = c.id_contact_type 
                                                     WHERE 
                                                     c.id_location IN ($id_location) 
                                                     AND c.phone IN('$numero')
                                                     AND c.id_contact_status IN (1)
                                                     ORDER BY c.c_date DESC LIMIT 1";
                                                     $rstCheck = $db->select($sqlGetContac);
-    			                                    $contact_name = $rstCheck[0]['contact_name'] ?? 0;
+    			                                       $contact_name = $rstCheck[0]['contact_name'] ?? 0;
                                                     $locId = $rstCheck[0]['id_location'] ?? 0;
-                                                    // $ubicacion = ($locId==1)? 'Tlaquiltenango':' Zacatepec';
-                                                    if($locId==$id_location){
-                                                         echo '
-                                                       <li onclick="window.location.href=\'?phone='.$chat['sender_phone'].'\'" class="chat-item">
-                                                          <span>
-                                                                <span class="name_user">'.$contact_name.'<br>'.$numero.'</span>
-                                                                <span class="msg_user">'.htmlspecialchars($chat['last_message']).'</span>
-                                                                <span class="time_ago">'.date("H:i", strtotime($chat['last_date'])).'</span>
-                                                          </span>
-                                                       </li>';
-                                                    }else{
-                                                        /*
-                                                        echo $sqlGetContac;
-                                                        echo '
-                                                       <li onclick="window.location.href=\'?phone='.$chat['sender_phone'].'\'" class="chat-item">
-                                                          <span>
-                                                                <span class="name_user" style="color:red;">'.$numero.'</span>
-                                                                <span class="msg_user">'.htmlspecialchars($chat['last_message']).'</span>
-                                                                <span class="time_ago">'.date("H:i", strtotime($chat['last_date'])).'</span>
-                                                          </span>
-                                                       </li>';
-                                                       */
-                                                       //TODO::revisar numeros
-                                                    }
-                                                }
-                                                ?>
-                                             </ul>
-                                          </div>
+                                                    // $ubicacion = ($locId==1)? 'Tlaquiltenango':' Zacatepec';*/
+                                                   $numero = substr($chat['sender_phone'], 3); ?>
+                                                   <li class="chat-item" data-phone="<?php echo $chat['sender_phone']; ?>">
+                                                      <span>
+                                                         <span class="name_user"><?php echo $numero; ?></span>
+                                                         <span class="msg_user"><?php echo htmlspecialchars($chat['last_message']); ?></span>
+                                                         <span class="time_ago"><?php echo date("H:i", strtotime($chat['last_date'])); ?></span>
+                                                      </span>
+                                                   </li>
+                                             <?php endforeach; ?>
+                                          </ul>
+                                       </div>
                                        </div>
                                     </div>
                                  </div>
                               </div>
                            </div>
                         </div>
-                  <input type="hidden" id="tophone" value="<?php echo $phone;?>">
+                  
 						<!-- --------------- -->
                   <div class="col-md-8 chat-wrapper">
                      <div class="white_shd full margin_bottom_30" style="display: block !important;">
                         <div class="full graph_head">
                            <div class="heading1 margin_0">
-                              <h2><?php echo $phone; ?> </h2>
+                              <h2><input type="text" id="tophone" value="" readonly></h2>
                            </div>
                         </div>
 
                         <!-- Contenedor conversación -->
-                        <div class="full progress_bar_inner chat-container">
-                           <?php
-                           if (!empty($mensajes)) {
-                              foreach ($mensajes as $msg) {
-                                 $tipo = ($msg['sender_phone'] == $waba_number) ? 'sent' : 'received';
-                                 $hora = date('h:i A', strtotime($msg['datelog']));
-                                 echo '<div class="chat-bubble '.$tipo.'">'.htmlspecialchars($msg['message_text']).'<span class="time">'.$hora.'</span></div>';
-                              }
-                           } else {
-                              echo "<p style='text-align:center;color:#777;'>No hay mensajes.</p>";
-                           }
-                           ?>
+                        <div class="full progress_bar_inner chat-container" id="chat-container">
+                           <p style="text-align:center;color:#777;">Selecciona un chat para ver los mensajes.</p>
                         </div>
-
                         <!-- Barra para escribir mensaje -->
                         <div class="chat-input-area">
                            <input type="text" class="chat-input" id="chat-input" placeholder="Escribe un mensaje...">

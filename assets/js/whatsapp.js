@@ -7,36 +7,39 @@ $(document).ready(function() {
         });
 
 	function sendwts() {
-		let tophone =  $('#tophone').val();
-		let msj= $('#chat-input').val();
-		if(tophone=='' || msj==''){
-			swal("Atención!", "* Campos requeridos", "error");
-			return;
-		}
-		$.ajax({
-            url: "https://graph.facebook.com/v19.0/683077594899877/messages",
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer EAAYTcZCLS2AABPWBNEmHaeUcQMoHC8M3XfB2l9rrSHECsZB66Fo5X1M8h1giJDx4VoOZBZBYKrwjSpoBspaM7sgE31BLBqvXROCI34SFZBZBfcSIABALLmlyZApk7NcZCQgR8fpRLVXfLiXqj2AkQ4LdFFM02hlNqaM3H1rYr6pKuYyQyEqv8uhq1WaZBIQHNRXZCAzc6wju4cYilVVNpZAoHdLKeeZARynpST4mu94dUXANvG0YGQZDZD",
-                "Content-Type": "application/json"
-            },
-            data: JSON.stringify({
-                "messaging_product": "whatsapp",
-                "to": tophone,
-                "type": "text",
-                "text": {
-                    "body": msj
-                }
-            }),
-            success: function(response) {
+		 let tophone = $('#tophone').val();
+    let msj = $('#chat-input').val();
+
+    $.ajax({
+        url: baseController,
+        method: "POST",
+        data: {
+            action: 'sendMessage',
+            tophone: tophone,
+            msj: msj,
+            option:'sendMessage'
+        },
+        dataType: 'json',
+        beforeSend: function() {
+            showSwal('Enviando mensaje', 'Espere por favor...');
+            $('.swal-button-container').hide();
+        },
+        success: function(response) {
+            swal.close();
+            if (response.success) {
                 console.log("Mensaje enviado:", response);
                 $('#chat-input').val('');
-                swal(`Éxito`, `Mensaje enviado`, "success");
-            },
-            error: function(xhr) {
-                console.error("Error:", xhr.responseText);
+                // ✅ Opcional: recargar mensajes
+                loadChatMessages(tophone);
+            } else {
+                swal("Error", response.message, "error");
             }
-        });
+        },
+        error: function(xhr) {
+            swal.close();
+            swal("Error", "Hubo un problema al enviar el mensaje.", "error");
+        }
+    });
 	}
 
     	//--------------
@@ -155,4 +158,58 @@ Te compartimos los datos de tu pedido: folios_db.
     enviarSiguiente();
 });
 
+$(document).on('click', '.chat-item', function() {
+    let phone = $(this).data('phone'); // data-phone en el <li>
+    
+    $.ajax({
+        url: `${base_url}/${baseController}`,
+        type: 'POST',
+        data: { phone: phone, option: 'getAllMessagesToRead' },
+        dataType: 'json',
+        beforeSend: function() {
+            showSwal('Cargando mensajes', 'Espere por favor...');
+            $('.swal-button-container').hide();
+        },
+        success: function(mensajes) {
+            let html = '';
+            
+            if (mensajes.length > 0) {
+                $("#tophone").val(phone);
+                console.log('ok mensajes');
+                mensajes.forEach(msg => {
+                    console.log(msg);
+                    let tipo = (msg.sender_phone === '7344093961') ? 'sent' : 'received';
+                    let hora = new Date(msg.datelog.replace(' ', 'T')).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    html += `<div class="chat-bubble ${tipo}">
+                                ${msg.message_text}
+                                <span class="time">${hora}</span>
+                             </div>`;
+                });
+            } else {
+                html = "<p style='text-align:center;color:#777;'>No hay mensajes.</p>";
+            }
+
+            $('#chat-container').html(html);
+
+            // ✅ Scroll al final
+            $('#chat-container').scrollTop($('#chat-container')[0].scrollHeight);
+
+            // ✅ Cierra SweetAlert después de cargar mensajes
+            swal.close();
+        },
+        error: function(xhr, status, error) {
+            swal.close();
+            console.error("Error al cargar mensajes:", error);
+        }
+    });
 });
+
+
+
+
+});
+
+

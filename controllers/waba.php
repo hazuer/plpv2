@@ -13,11 +13,12 @@ define( '_VALID_MOS', 1 );
 date_default_timezone_set('America/Mexico_City');
 
 require_once('../includes/configuration.php');
-require_once('../includes/DB.php');
+require_once('../includes/DBW.php');
 $db = new DB(HOST,USERNAME,PASSWD,DBNAME,PORT,SOCKET);
 
 header('Content-Type: application/json; charset=utf-8');
-
+$token = "EAAYTcZCLS2AABPQAZAjzSVPZBZAUCSSgqZAZCXODZAyFySyAN10SIL6BluwAW2VvvFrmPJIixawChknpxW9P5bjXeDC4ZBsAvhpxQIqi4mCRZAPM3ir1E3vOecLZCFhhHN6tQCaiZBYKHoOWR6orZAGgN20n017ZCXvpkVAfW4pGg4HIu1AqpfVEO8tkW04pVYMpk2wHmco3fHHp3kkM1ljZCPyyADoVKn6dFfwhRsZCuiq";
+$sender_phone='5217344093961';
 switch ($_POST['option']) {
 	case 'sendTemplate':
 		$result   = [];
@@ -37,23 +38,9 @@ switch ($_POST['option']) {
 		$idParceIn   = ($mbIdCatParcel==99) ? '1,2,3': $mbIdCatParcel;
 		$number = $_POST['number']; // Solo un número
 
-		//$plb  = $_POST['mBListTelefonos'];
-		//$lineas = explode("\n", $plb);
-
 		$n_user_id=$_SESSION["uId"];
 
-		// Iterar sobre cada línea y limpiarla (eliminar espacios y comillas)
-		/*$numeros_de_telefono = [];
-		foreach ($lineas as $linea) {
-			$numero = trim(str_replace('"', '', $linea));
-			if (!empty($numero)) {
-				$numeros_de_telefono[] = $numero;
-			}
-		}*/
 
-		// Unir los números de teléfono en un solo string con comas
-		#var_dump($numeros_de_telefono);
-			//foreach ($numeros_de_telefono as $number) {
 			$sql ="SELECT 
 			cc.phone,
 			cc.id_contact_type,
@@ -118,8 +105,6 @@ switch ($_POST['option']) {
 						//await sleep(1000); // tiempo de espera en segundos entre cada envío
 					//}
 				}*/
-				$url = "https://graph.facebook.com/v23.0/683077594899877/messages";
-				$token = "EAAYTcZCLS2AABPWBNEmHaeUcQMoHC8M3XfB2l9rrSHECsZB66Fo5X1M8h1giJDx4VoOZBZBYKrwjSpoBspaM7sgE31BLBqvXROCI34SFZBZBfcSIABALLmlyZApk7NcZCQgR8fpRLVXfLiXqj2AkQ4LdFFM02hlNqaM3H1rYr6pKuYyQyEqv8uhq1WaZBIQHNRXZCAzc6wju4cYilVVNpZAoHdLKeeZARynpST4mu94dUXANvG0YGQZDZD";
 
 				$data = [
 					"messaging_product" => "whatsapp",
@@ -145,6 +130,9 @@ switch ($_POST['option']) {
 					]
 				];
 
+				$url = "https://graph.facebook.com/v23.0/683077594899877/messages";
+
+				$url = "https://graph.facebook.com/v23.0/683077594899877/messages";
 				$ch = curl_init($url);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				curl_setopt($ch, CURLOPT_POST, true);
@@ -166,12 +154,8 @@ switch ($_POST['option']) {
 				$newStatusPackage=1;
 				// Verificar éxito o error
 				if ($httpCode >= 200 && $httpCode < 300) {
-					echo "✅ Mensaje enviado con éxito\n";
-					#print_r($result);
 					$newStatusPackage =2;
 				} else {
-					echo "❌ Error al enviar mensaje\n";
-					#print_r($result);
 					$newStatusPackage=6;
 				}
 
@@ -202,7 +186,7 @@ switch ($_POST['option']) {
 					$dataLog = [
 						'id_log'       => null,
 						'datelog'      => date("Y-m-d H:i:s"),
-						'sender_phone' => '5217344093961',
+						'sender_phone' => $sender_phone,
 						'message_id'   => $id_package,
 						'message_text' => $tguias,
 						'raw_json'     => $id_package
@@ -214,5 +198,86 @@ switch ($_POST['option']) {
 		//}
 		    echo json_encode(['success' => true, 'message' => "Mensaje enviado a $number"]);
 
+	break;
+
+	case 'getAllMessagesToRead':
+		$phone = $_POST['phone'] ?? '';
+		//$waba_number = '7344093961';
+
+		if (!$phone) {
+			echo json_encode([]);
+			exit;
+		}
+
+		$sql = "SELECT message_text, datelog, sender_phone
+			FROM waba_callbacks
+			WHERE sender_phone = '$phone'
+			ORDER BY datelog ASC";
+			$mensajes = $db->select($sql);
+
+		// Marcar como leídos
+		$sql = "UPDATE waba_callbacks 
+				SET is_read = 1, 
+					read_at = '" . date("Y-m-d H:i:s") . "', 
+					read_by = " . intval($_SESSION['uId']) . " 
+				WHERE sender_phone = '" .$phone . "' AND is_read = 0";
+		#TODO$db->sqlPure($sql, false);
+
+		echo json_encode($mensajes);
+		break;
+		
+		case 'sendMessage':
+			$tophone = $_POST['tophone'] ?? '';
+    		$msj = $_POST['msj'] ?? '';
+
+			if (empty($tophone) || empty($msj)) {
+				echo json_encode(['success' => false, 'message' => 'Faltan datos.']);
+				exit;
+			}
+
+			$url = "https://graph.facebook.com/v19.0/683077594899877/messages";
+
+			$payload = [
+				"messaging_product" => "whatsapp",
+				"to" => $tophone,
+				"type" => "text",
+				"text" => [
+					"body" => $msj
+				]
+			];
+
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, [
+				"Authorization: Bearer $token",
+				"Content-Type: application/json"
+			]);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+
+			$response = curl_exec($ch);
+			$error = curl_error($ch);
+			curl_close($ch);
+
+			if ($error) {
+				echo json_encode(['success' => false, 'message' => "cURL Error: $error"]);
+				exit;
+			}
+
+			$decoded = json_decode($response, true);
+			if (isset($decoded['messages'])) {
+					$dataLog = [
+					'id_log'       => null,
+					'datelog'      => date("Y-m-d H:i:s"),
+					'sender_phone' => $sender_phone,
+					'message_id'   => 0,
+					'message_text' => $msj,
+					'raw_json'     => $decoded
+				];
+				$db->insert('waba_callbacks', $dataLog);
+				echo json_encode(['success' => true, 'data' => $decoded]);
+			} else {
+				echo json_encode(['success' => false, 'message' => 'Error al enviar mensaje', 'response' => $decoded]);
+			}
 	break;
 }
