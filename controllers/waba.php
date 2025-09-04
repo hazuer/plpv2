@@ -17,7 +17,7 @@ require_once('../includes/DBW.php');
 $db = new DB(HOST,USERNAME,PASSWD,DBNAME,PORT,SOCKET);
 
 header('Content-Type: application/json; charset=utf-8');
-$token = "EAAYTcZCLS2AABPQAZAjzSVPZBZAUCSSgqZAZCXODZAyFySyAN10SIL6BluwAW2VvvFrmPJIixawChknpxW9P5bjXeDC4ZBsAvhpxQIqi4mCRZAPM3ir1E3vOecLZCFhhHN6tQCaiZBYKHoOWR6orZAGgN20n017ZCXvpkVAfW4pGg4HIu1AqpfVEO8tkW04pVYMpk2wHmco3fHHp3kkM1ljZCPyyADoVKn6dFfwhRsZCuiq";
+/*$token = "EAAYTcZCLS2AABPQAZAjzSVPZBZAUCSSgqZAZCXODZAyFySyAN10SIL6BluwAW2VvvFrmPJIixawChknpxW9P5bjXeDC4ZBsAvhpxQIqi4mCRZAPM3ir1E3vOecLZCFhhHN6tQCaiZBYKHoOWR6orZAGgN20n017ZCXvpkVAfW4pGg4HIu1AqpfVEO8tkW04pVYMpk2wHmco3fHHp3kkM1ljZCPyyADoVKn6dFfwhRsZCuiq";*/
 $wabaPhone='5217344093961';
 switch ($_POST['option']) {
 	case 'sendTemplate':
@@ -27,44 +27,50 @@ switch ($_POST['option']) {
 		$message  = 'Error al enviar los mensajes';
 
 		$id_location   = $_POST['id_location'];
-		$id_estatus=$_POST['mBEstatus'];
-		$mbIdCatParcel=$_POST['mbIdCatParcel'];
-		$field2=$_POST['field2'];
-		$field3=$_POST['field3'];
-		$field4=$_POST['field4'];
-		$field5=$_POST['field5'];
-		$field6=$_POST['field6'];
+		$id_estatus    = $_POST['mBEstatus'];
+		$mbIdCatParcel = $_POST['mbIdCatParcel'];
+		$field2        = $_POST['field2'];
+		$field3        = $_POST['field3'];
+		$field4        = $_POST['field4'];
+		$field5        = $_POST['field5'];
+		$field6        = $_POST['field6'];
 
-		$idParceIn   = ($mbIdCatParcel==99) ? '1,2,3': $mbIdCatParcel;
-		$number = $_POST['number']; // Solo un número
+		$txtTemplate      = $_POST['txtTemplate'];
+		$tokenWaba        = $_POST['tokenWaba'];
 
-		$n_user_id=$_SESSION["uId"];
+		$idParceIn = ($mbIdCatParcel==99) ? '1,2,3': $mbIdCatParcel;
+		$number    = $_POST['number']; // Solo un número
+		$n_user_id = $_SESSION["uId"];
 
 
-			$sql ="SELECT 
-			cc.phone,
-			cc.id_contact_type,
-			GROUP_CONCAT(p.id_package) AS ids,
-			GROUP_CONCAT('(',p.folio,')-',p.tracking,'' SEPARATOR '\n') AS folioGuias 
-			FROM package p 
-			INNER JOIN cat_contact cc ON cc.id_contact=p.id_contact 
-			WHERE 
-			p.id_location IN (".$id_location.") 
-			AND p.id_status IN (".$id_estatus.") 
-			AND cc.phone IN(".$number.") 
-			AND p.id_cat_parcel IN(".$idParceIn.") 
-			GROUP BY cc.phone";
-			$rst = $db->select($sql);
+		$sql ="SELECT 
+		cc.phone,
+		cc.id_contact_type,
+		GROUP_CONCAT(p.id_package) AS ids,
+		GROUP_CONCAT('(',p.folio,')-',p.tracking,'' SEPARATOR '\n') AS folioGuias 
+		FROM package p 
+		INNER JOIN cat_contact cc ON cc.id_contact=p.id_contact 
+		WHERE 
+		p.id_location IN (".$id_location.") 
+		AND p.id_status IN (".$id_estatus.") 
+		AND cc.phone IN(".$number.") 
+		AND p.id_cat_parcel IN(".$idParceIn.") 
+		GROUP BY cc.phone";
+		$rst = $db->select($sql);
 
-			//var_dump($rst);
+
 			
 			if(count($rst)>0){
-			$ids               = $rst[0] ? $rst[0]['ids'] : 0;
+			$ids             = $rst[0] ? $rst[0]['ids'] : 0;
 			$id_contact_type = $rst[0] ? $rst[0]['id_contact_type'] : 0;
-			$folioGuias    = $rst[0] ? $rst[0]['folioGuias'] : 0;
+			$folioGuias      = $rst[0] ? $rst[0]['folioGuias'] : 0;
 			#$fullMessage   = "{message}";
 			$sid = "";
-			$totalRegistros=count($folioGuias);
+			
+			// convertir en array
+			$idsArray = explode(',', $ids);
+			// contar
+			$totalRegistros = count($idsArray);
 			$tguias="Total:".$totalRegistros.", Folio y guías ".$folioGuias;
 				
 				/*let registros = folioGuias ? folioGuias.split('\n').filter(Boolean) : [];
@@ -132,12 +138,11 @@ switch ($_POST['option']) {
 
 				$url = "https://graph.facebook.com/v23.0/683077594899877/messages";
 
-				$url = "https://graph.facebook.com/v23.0/683077594899877/messages";
 				$ch = curl_init($url);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				curl_setopt($ch, CURLOPT_POST, true);
 				curl_setopt($ch, CURLOPT_HTTPHEADER, [
-					"Authorization: Bearer $token",
+					"Authorization: Bearer $tokenWaba",
 					"Content-Type: application/json"
 				]);
 				curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
@@ -147,8 +152,9 @@ switch ($_POST['option']) {
 				$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 				curl_close($ch);
 
-				// Decodificar respuesta
+				// JSON de respuesta
 				$fullLog = json_encode(json_decode($response, true), JSON_UNESCAPED_UNICODE);
+				$decoded = json_decode($response, true);
 
 
 				$newStatusPackage=1;
@@ -166,10 +172,13 @@ switch ($_POST['option']) {
 				#let fullLog=`${sid}, ${logWhats}`;
 				foreach ($listIds as $id_package) {
 					#const id_package = listIds[i];
+					$fullTemplate = str_replace("usuario_db,", $number, $txtTemplate);
+					$fullTemplate = str_replace("folios_db", $tguias, $txtTemplate);
+
 					$sqlSaveNotification = "INSERT INTO notification 
 					(id_location,n_date,n_user_id,message,id_contact_type,sid,id_package) 
 					VALUES 
-					($id_location,'$nDate',$n_user_id,'$tguias',$id_contact_type,'$fullLog',$id_package)";
+					($id_location,'$nDate',$n_user_id,'$fullTemplate',$id_contact_type,'$fullLog',$id_package)";
 					 $db->sqlPure($sqlSaveNotification, false);
 
 					$sqlLogger = "INSERT INTO logger 
@@ -183,15 +192,23 @@ switch ($_POST['option']) {
 					WHERE id_package IN ($id_package)";
 					$db->sqlPure($sqlUpdatePackage, false);
 
+					$message_id = $decoded['messages'][0]['id']; // ID que regresa la API
+					$raw_json = json_encode($decoded, JSON_UNESCAPED_UNICODE); // Guardar como JSON string
+var_dump($fullTemplate);
+					// Guardar log en DB
 					$dataLog = [
 						'id_log'       => null,
 						'datelog'      => date("Y-m-d H:i:s"),
-						'sender_phone' => $sender_phone,
-						'message_id'   => $id_package,
-						'message_text' => $tguias,
-						'raw_json'     => $id_package
+						'sender_phone' => $wabaPhone,
+						'message_id'   => $message_id ?? null,  // si no existe, null
+						'message_text' => $fullTemplate,
+						'raw_json'     => $fullLog,
+						'is_read'      => 1,
+						'read_at'      => date("Y-m-d H:i:s"),
+						'read_by'      => 'system'
 					];
-					$db->insert('waba_callbacks', $dataLog);
+
+					$inserted = $db->insert('waba_callbacks', $dataLog);
 				}
 			
 			}

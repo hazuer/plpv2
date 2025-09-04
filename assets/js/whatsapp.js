@@ -81,7 +81,8 @@ Te compartimos los datos de tu pedido: folios_db.
     }
 
     // Eventos para actualizar en tiempo real
-    $("#field2, #field3, #field4, #field5, #field6").on("input change", actualizarPreview);
+    $("#field2, #field3, #field4, #field5, #field6, #mBEstatus").on("input change", actualizarPreview);
+
 
     $("#btn-send-template").on("click", function () {
     const numeros = $("#mBListTelefonos").val().trim().split("\n").filter(n => n !== "");
@@ -131,6 +132,9 @@ Te compartimos los datos de tu pedido: folios_db.
         formData.append('field5', $("#field5").val());
         formData.append('field6', $("#field6").val());
         formData.append('number', numero);
+        let texto = $("#preview-template").text();
+        formData.append('txtTemplate', texto);
+        formData.append('tokenWaba', $("#tokenWaba").val());
         formData.append('option', 'sendTemplate');
 
         $.ajax({
@@ -180,13 +184,16 @@ $(document).on('click', '.chat-item', function() {
                     console.log(msg);
                     const myNumber = '5217344093961'; // tu número WABA
                 let tipo = (msg.sender_phone === myNumber) ? 'sent' : 'received';
-                    let hora = new Date(msg.datelog.replace(' ', 'T')).toLocaleTimeString([], {
+                    let fechaHora = new Date(msg.datelog.replace(' ', 'T')).toLocaleString([], {
+                        weekday: 'short',  // ej: "lun"
+                        day: '2-digit',    // ej: "03"
+                        month: 'short',    // ej: "sep"
                         hour: '2-digit',
                         minute: '2-digit'
                     });
                     html += `<div class="chat-bubble ${tipo}">
                                 ${msg.message_text}
-                                <span class="time">${hora}</span>
+                                <span class="time">${fechaHora}</span>
                              </div>`;
                 });
             } else {
