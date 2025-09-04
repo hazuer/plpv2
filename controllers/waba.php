@@ -57,7 +57,8 @@ switch ($_POST['option']) {
 		AND p.id_cat_parcel IN(".$idParceIn.") 
 		GROUP BY cc.phone";
 		$rst = $db->select($sql);
-
+		
+/* */
 
 			
 			if(count($rst)>0){
@@ -66,12 +67,32 @@ switch ($_POST['option']) {
 			$folioGuias      = $rst[0] ? $rst[0]['folioGuias'] : 0;
 			#$fullMessage   = "{message}";
 			$sid = "";
+
+			$sqlGetName="SELECT c.contact_name 
+			FROM cat_contact c 
+				WHERE 
+				c.id_location IN ($id_location) 
+				AND c.phone IN('$number') 
+				AND c.id_contact_status IN(1)
+				ORDER BY c.c_date DESC LIMIT 2";
+			$contacts = $db->select($sqlGetName);
+			$customNameUser=$number;
+			//var_dump($contacts);
+			if(count($contacts)==1){
+				$customNameUser=$contacts[0]['contact_name'];
+			}
 			
 			// convertir en array
 			$idsArray = explode(',', $ids);
 			// contar
 			$totalRegistros = count($idsArray);
-			$tguias="Total:".$totalRegistros.", Folio y guías ".$folioGuias;
+			$tguias="Total:".$totalRegistros.", Folio y guías: ".$folioGuias;
+
+			//var_dump($txtTemplate);
+			$fullTemplate = str_replace("usuario_db,", $customNameUser, $txtTemplate);
+			$fullTemplate = str_replace("folios_db", $tguias, $fullTemplate);
+			//var_dump($fullTemplate);
+			//die();
 				
 				/*let registros = folioGuias ? folioGuias.split('\n').filter(Boolean) : [];
 				let totalRegistros = registros.length;
@@ -123,7 +144,7 @@ switch ($_POST['option']) {
 							[
 								"type" => "body",
 								"parameters" => [
-									["type" => "text", "text" => $number], //nombre
+									["type" => "text", "text" => $customNameUser], //nombre
 									["type" => "text", "text" => $field2], //ubicacion
 									["type" => "text", "text" => $field3], // hora hoy
 									["type" => "text", "text" => $field4], // hora mañana
@@ -137,7 +158,6 @@ switch ($_POST['option']) {
 				];
 
 				$url = "https://graph.facebook.com/v23.0/683077594899877/messages";
-
 				$ch = curl_init($url);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				curl_setopt($ch, CURLOPT_POST, true);
@@ -155,7 +175,8 @@ switch ($_POST['option']) {
 				// JSON de respuesta
 				$fullLog = json_encode(json_decode($response, true), JSON_UNESCAPED_UNICODE);
 				$decoded = json_decode($response, true);
-
+				$message_id = $decoded['messages'][0]['id']; // ID que regresa la API
+				$raw_json = json_encode($decoded, JSON_UNESCAPED_UNICODE); // Guardar como JSON string
 
 				$newStatusPackage=1;
 				// Verificar éxito o error
@@ -167,13 +188,13 @@ switch ($_POST['option']) {
 
 
 				$listIds = explode(",", $ids);
+				//var_dump($listIds);
 				$nDate = date('Y-m-d H:I:s'); 
 
 				#let fullLog=`${sid}, ${logWhats}`;
 				foreach ($listIds as $id_package) {
 					#const id_package = listIds[i];
-					$fullTemplate = str_replace("usuario_db,", $number, $txtTemplate);
-					$fullTemplate = str_replace("folios_db", $tguias, $txtTemplate);
+					
 
 					$sqlSaveNotification = "INSERT INTO notification 
 					(id_location,n_date,n_user_id,message,id_contact_type,sid,id_package) 
@@ -192,9 +213,8 @@ switch ($_POST['option']) {
 					WHERE id_package IN ($id_package)";
 					$db->sqlPure($sqlUpdatePackage, false);
 
-					$message_id = $decoded['messages'][0]['id']; // ID que regresa la API
-					$raw_json = json_encode($decoded, JSON_UNESCAPED_UNICODE); // Guardar como JSON string
-var_dump($fullTemplate);
+					
+//var_dump($fullTemplate);
 					// Guardar log en DB
 					$dataLog = [
 						'id_log'       => null,
@@ -205,7 +225,7 @@ var_dump($fullTemplate);
 						'raw_json'     => $fullLog,
 						'is_read'      => 1,
 						'read_at'      => date("Y-m-d H:i:s"),
-						'read_by'      => 'system'
+						'read_by'      => intval($_SESSION['uId'])
 					];
 
 					$inserted = $db->insert('waba_callbacks', $dataLog);
@@ -241,8 +261,10 @@ var_dump($fullTemplate);
         ELSE 'incoming' 
     END AS message_type 
 FROM waba_callbacks 
-WHERE sender_phone = '".$wabaPhone."' 
-   OR (sender_phone = '".$phone."' AND raw_json LIKE '%".$wabaPhone."%') 
+WHERE 
+   (sender_phone = '".$wabaPhone."' AND raw_json LIKE '%".$phone."%') 
+   OR 
+   (sender_phone = '".$phone."') 
 ORDER BY datelog ASC";
 $mensajes = $db->select($sql);
 
@@ -260,6 +282,7 @@ $mensajes = $db->select($sql);
 		case 'sendMessage':
 			$tophone = $_POST['tophone'] ?? '';
     		$msj = $_POST['msj'] ?? '';
+			$tokenWaba        = $_POST['tokenWaba'];
 
 			if (empty($tophone) || empty($msj)) {
 				echo json_encode(['success' => false, 'message' => 'Faltan datos.']);
@@ -281,7 +304,7 @@ $mensajes = $db->select($sql);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_HTTPHEADER, [
-				"Authorization: Bearer $token",
+				"Authorization: Bearer $tokenWaba",
 				"Content-Type: application/json"
 			]);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
@@ -311,7 +334,7 @@ $mensajes = $db->select($sql);
 					'raw_json'     => $raw_json,
 					'is_read'      => 1, // Ya leído porque lo enviaste
 					'read_at'      => date("Y-m-d H:i:s"),
-					'read_by'      => 'system'
+					'read_by'      => intval($_SESSION['uId'])
 				];
 
 				$inserted = $db->insert('waba_callbacks', $dataLog);

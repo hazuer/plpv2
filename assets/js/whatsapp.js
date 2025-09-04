@@ -17,6 +17,7 @@ $(document).ready(function() {
             action: 'sendMessage',
             tophone: tophone,
             msj: msj,
+            tokenWaba: $("#tokenWaba").val(),
             option:'sendMessage'
         },
         dataType: 'json',
@@ -27,10 +28,10 @@ $(document).ready(function() {
         success: function(response) {
             swal.close();
             if (response.success) {
-                console.log("Mensaje enviado:", response);
+                //console.log("Mensaje enviado:", response);
                 $('#chat-input').val('');
                 // ✅ Opcional: recargar mensajes
-                loadChatMessages(tophone);
+                //loadChatMessages(tophone);
             } else {
                 swal("Error", response.message, "error");
             }
@@ -179,7 +180,7 @@ $(document).on('click', '.chat-item', function() {
             
             if (mensajes.length > 0) {
                 $("#tophone").val(phone);
-                console.log('ok mensajes');
+                //console.log('ok mensajes');
                 mensajes.forEach(msg => {
                     console.log(msg);
                     const myNumber = '5217344093961'; // tu número WABA
