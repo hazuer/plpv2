@@ -1,7 +1,7 @@
 		.chat-container {
 			background: #ece5dd;
 			padding: 15px;
-			height: 400px;
+			height: 300px !important;
 			overflow-y: auto;
 			display: flex;
 			flex-direction: column;
@@ -90,6 +90,21 @@
 }
 
 .btn-send i {
+    font-size: 18px;
+}
+
+.btn-read {
+    background: #03a9f4; /* Verde estilo WhatsApp */
+    border: none;
+    padding: 10px 15px;
+    margin-left: 10px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-read i {
     font-size: 18px;
 }
 

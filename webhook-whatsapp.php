@@ -19,11 +19,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 // Recepción del webhook (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    define('_VALID_MOS', 1);
+
+    require_once('includes/configuration.php');
+    require_once('includes/DBW.php');
+    $db = new DB(HOST, USERNAME, PASSWD, DBNAME, PORT, SOCKET);
+
     // Capturar el JSON crudo
     $input = file_get_contents('php://input');
 
     // Log para depuración
-    file_put_contents('webhook_log.txt', "[" . date('Y-m-d H:i:s') . "] " . $input . PHP_EOL, FILE_APPEND);
+    file_put_contents(date('Y-m-d').'general', "[" . date('Y-m-d H:i:s') . "] " . $input . PHP_EOL, FILE_APPEND);
 
     // Decodificar JSON
     $data = json_decode($input, true);
@@ -32,6 +39,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         http_response_code(400);
         echo "Invalid JSON";
         exit;
+    }
+
+       // ✅ 1. Procesar estados de mensajes enviados
+    if (isset($data['entry'][0]['changes'][0]['value']['statuses'][0])) {
+        $status = $data['entry'][0]['changes'][0]['value']['statuses'][0];
+
+        $message_id  = $status['id'] ?? '';
+        $status_name = $status['status'] ?? '';
+        $recipient   = $status['recipient_id'] ?? '';
+        $timestamp   = isset($status['timestamp']) ? date('Y-m-d H:i:s', $status['timestamp']) : date('Y-m-d H:i:s');
+
+        if (!empty($message_id) && !empty($status_name)) {
+            $sql = "INSERT INTO waba_status (datelog, message_id, status_name, recipient_phone, raw_json)
+                VALUES ('$timestamp', '$message_id', '$status_name', '$recipient', '" . addslashes($input) . "')";
+
+            try {
+                $db->sqlPure($sql, false);
+                #file_put_contents('webhook_log_estatus_ok.txt', "STATUS OK: $message_id - $status_name" . PHP_EOL, FILE_APPEND);
+            } catch (Exception $e) {
+                file_put_contents('webhook_log_estatus_error.txt', "DB ERROR STATUS: " . $e->getMessage() . PHP_EOL, FILE_APPEND);
+            }
+        }
     }
 
     // Verificar si hay mensajes
@@ -70,31 +99,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Validar datos mínimos antes de insertar
         if (!empty($from) && !empty($message_id)) {
-            define('_VALID_MOS', 1);
-            date_default_timezone_set('America/Mexico_City');
-
-            require_once('includes/configuration.php');
-            require_once('includes/DBW.php');
-            $db = new DB(HOST, USERNAME, PASSWD, DBNAME, PORT, SOCKET);
 
             // Escapar valores para evitar SQL injection y errores de caracteres
-            $date           = date("Y-m-d H:i:s");
+            $date = date("Y-m-d H:i:s");
             // Sentencia SQL directa
-            $sql = "
-                INSERT INTO waba_callbacks (datelog, sender_phone, message_id, message_text, raw_json)
-                VALUES ('$date', '$from', '$message_id', '$body', '$raw_json')
-            ";
+            $sql = "INSERT INTO waba_callbacks (datelog, sender_phone, message_id, message_text, raw_json,source) 
+            VALUES ('$date', '$from', '$message_id', '$body', '$raw_json','callback_user')";
             try {
                 // Insertar en base de datos
                 $db->sqlPure($sql, false);
 
                 // Log adicional para confirmar inserción
-                file_put_contents('webhook_logok.txt', "INSERT OK: $from - $body" . PHP_EOL, FILE_APPEND);
+                // file_put_contents('webhook_logok.txt', "INSERT OK: $from - $body" . PHP_EOL, FILE_APPEND);
             } catch (Exception $e) {
-                file_put_contents('webhook_logerror.txt', "DB ERROR: " . $e->getMessage() . PHP_EOL, FILE_APPEND);
+                file_put_contents('webhook_message_error.txt', "DB ERROR: " . $e->getMessage() . PHP_EOL, FILE_APPEND);
             }
         } else {
-            file_put_contents('webhook_logelse.txt', "Datos incompletos: " . print_r($message, true) . PHP_EOL, FILE_APPEND);
+            file_put_contents('webhook_message_else.txt', "Datos incompletos: " . print_r($message, true) . PHP_EOL, FILE_APPEND);
         }
     }
 

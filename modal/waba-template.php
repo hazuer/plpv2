@@ -48,37 +48,37 @@
         <h5><b>Llenar Campos de la Plantilla:</b></h5>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-12">
         <div class="form-group">
-            <label for="field2">Ubicacion ({{2}}):</label>
+            <label for="field2">*Ubicacion (2):</label>
             <input type="text" class="form-control" id="field2" value="<?php echo $infoLocation[0]['address'].', '.$infoLocation[0]['address_share'];?>">
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="form-group">
-            <label for="field3">Hora Hoy ({{3}}):</label>
+            <label for="field3">*Hr. Hoy (3):</label>
             <input type="text" class="form-control" id="field3" value="05:00 PM">
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="form-group">
-            <label for="field4">Hora Mañana ({{4}}):</label>
-            <input type="text" class="form-control" id="field4" value="09:00 AM">
+            <label for="field4">*Hr. Mañana (4):</label>
+            <input type="text" class="form-control" id="field4" value="05:00 PM">
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="form-group">
-            <label for="field5">Fecha Devolución ({{5}}):</label>
+            <label for="field5">*Fecha Dev. (5):</label>
             <input type="text" class="form-control" id="field5" value="<?php echo $fechaDev;?>">
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="form-group">
-            <label for="field6">Hora Devolución ({{6}}):</label>
+            <label for="field6">*Hr. Dev. (6):</label>
             <input type="text" class="form-control" id="field6" value="07:00 AM">
         </div>
     </div>

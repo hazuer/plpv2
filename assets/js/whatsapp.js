@@ -2,9 +2,16 @@ $(document).ready(function() {
 	let baseController = 'controllers/waba.php';
     let idLocationSelected = $('#option-location');
 
-		$('#btn-send').click(function(){
+    $('#btn-send').click(function(){
+        sendwts();
+    });
+
+    $('#chat-input').on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // evita que haga salto de línea si es textarea
             sendwts();
-        });
+        }
+    });
 
 	function sendwts() {
 		 let tophone = $('#tophone').val();
@@ -40,7 +47,7 @@ $(document).ready(function() {
             swal.close();
             swal("Error", "Hubo un problema al enviar el mensaje.", "error");
         }
-    });
+        });
 	}
 
     	//--------------
@@ -86,82 +93,96 @@ Te compartimos los datos de tu pedido: folios_db.
 
 
     $("#btn-send-template").on("click", function () {
-    const numeros = $("#mBListTelefonos").val().trim().split("\n").filter(n => n !== "");
-    const total = numeros.length;
+        const numeros = $("#mBListTelefonos").val().trim().split("\n").filter(n => n !== "");
+        const total = numeros.length;
 
-    if (total === 0) {
-        swal("Atención!", "Lista de Teléfonos vacía", "error");
-        return;
-    }
-
-    // SweetAlert con barra de progreso dentro
-    swal({
-        title: "Enviando mensajes...",
-        content: {
-            element: "div",
-            attributes: {
-                innerHTML: `
-                    <div style="width:100%;border:1px solid #ccc;border-radius:5px;">
-                        <div id="progress-bar" style="width:0%;background:#28a745;height:20px;border-radius:5px;"></div>
-                    </div>
-                    <p id="progress-text" style="margin-top:10px;">0 de ${total}</p>
-                `
-            }
-        },
-        buttons: false,
-        closeOnClickOutside: false,
-        closeOnEsc: false
-    });
-
-    let index = 0;
-
-    function enviarSiguiente() {
-        if (index >= total) {
-            swal("¡Proceso completado!", `${total} mensajes enviados correctamente.`, "success");
+        if (total === 0) {
+            swal("Atención!", "Lista de Teléfonos vacía", "error");
             return;
         }
 
-        const numero = numeros[index];
-
-        let formData = new FormData();
-        formData.append('id_location', idLocationSelected.val());
-        formData.append('mBEstatus', $("#mBEstatus").val());
-        formData.append('mbIdCatParcel', $("#mbIdCatParcel").val());
-        formData.append('field2', $("#field2").val());
-        formData.append('field3', $("#field3").val());
-        formData.append('field4', $("#field4").val());
-        formData.append('field5', $("#field5").val());
-        formData.append('field6', $("#field6").val());
-        formData.append('number', numero);
-        let texto = $("#preview-template").text();
-        formData.append('txtTemplate', texto);
-        formData.append('tokenWaba', $("#tokenWaba").val());
-        formData.append('option', 'sendTemplate');
-
-        $.ajax({
-            url: `${base_url}/${baseController}`,
-            type: 'POST',
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
-            success: function (response) {
-                index++;
-                let porcentaje = Math.round((index / total) * 100);
-                $("#progress-bar").css("width", porcentaje + "%");
-                $("#progress-text").text(`${index} de ${total}`);
-                enviarSiguiente(); // Llamar al siguiente
+        // SweetAlert con barra de progreso dentro
+        swal({
+            title: "Enviando mensajes...",
+            content: {
+                element: "div",
+                attributes: {
+                    innerHTML: `
+                        <div style="width:100%;border:1px solid #ccc;border-radius:5px;">
+                            <div id="progress-bar" style="width:0%;background:#28a745;height:20px;border-radius:5px;"></div>
+                        </div>
+                        <p id="progress-text" style="margin-top:10px;">0 de ${total}</p>
+                    `
+                }
             },
-            error: function () {
-                index++;
-                $("#progress-text").text(`${index} de ${total} (Error)`);
-                enviarSiguiente();
-            }
+            buttons: false,
+            closeOnClickOutside: false,
+            closeOnEsc: false
         });
-    }
 
-    enviarSiguiente();
-});
+        let index = 0;
+        let successCount = 0;
+        let errorCount = 0;
+
+        function enviarSiguiente() {
+            if (index >= total) {
+                swal("¡Proceso completado!", 
+                    `${total} mensajes procesados.\n✅ Éxitosos: ${successCount}\n❌ Errores: ${errorCount}`, 
+                    "success");
+                return;
+            }
+            const numero = numeros[index];
+            let formData = new FormData();
+            formData.append('id_location', idLocationSelected.val());
+            formData.append('mBEstatus', $("#mBEstatus").val());
+            formData.append('mbIdCatParcel', $("#mbIdCatParcel").val());
+            formData.append('field2', $("#field2").val());
+            formData.append('field3', $("#field3").val());
+            formData.append('field4', $("#field4").val());
+            formData.append('field5', $("#field5").val());
+            formData.append('field6', $("#field6").val());
+            formData.append('number', numero);
+            let texto = $("#preview-template").text();
+            formData.append('txtTemplate', texto);
+            formData.append('tokenWaba', $("#tokenWaba").val());
+            formData.append('option', 'sendTemplate');
+
+            $.ajax({
+                url: `${base_url}/${baseController}`,
+                type: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    try {
+                        if (response.success === "true" || response.success === true) {
+                            successCount++;
+                        } else {
+                            errorCount++;
+                        }
+                    } catch (e) {
+                        errorCount++; // si no se puede parsear el JSON, lo contamos como error
+                    }
+
+                    index++;
+                    let porcentaje = Math.round((index / total) * 100);
+                    $("#progress-bar").css("width", porcentaje + "%");
+                    $("#progress-text").text(`${index} de ${total}`);
+                    enviarSiguiente(); // Llamar al siguiente
+                },
+                error: function () {
+                    errorCount++;
+                    index++;
+                    $("#progress-text").text(`${index} de ${total} (Error)`);
+                    enviarSiguiente();
+                }
+            });
+        }
+
+        enviarSiguiente();
+    });
+
 
 $(document).on('click', '.chat-item', function() {
     let phone = $(this).data('phone'); // data-phone en el <li>
@@ -217,6 +238,28 @@ $(document).on('click', '.chat-item', function() {
 });
 
 
+    $('#btn-read').click(function(){
+        markasread();
+    });
+    function markasread() {
+		let tophone = $('#tophone').val();
+    $.ajax({
+            url: baseController,
+            method: "POST",
+            data: {
+                tophone: tophone,
+                option:'markAsRead'
+            },
+            dataType: 'json',
+            success: function(response) {
+                swal("Éxito", "Mensajes leidos", "success");
+            },
+            error: function(xhr) {
+                swal.close();
+                swal("Error", "Error al actualizar lectura.", "error");
+            }
+        });
+	}
 
 
 });

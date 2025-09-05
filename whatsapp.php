@@ -22,15 +22,14 @@ WHERE
 GROUP BY 
     sender_phone 
 ORDER BY 
-    last_date DESC limit 5;";
+    last_date DESC;";
 $chats = $db->select($sql);
 #var_dump($chats);
 
 #Template
-$sqlLocationInfo ="SELECT * FROM cat_location WHERE id_location IN($id_location);";
+$sqlLocationInfo ="SELECT * FROM cat_location WHERE id_location IN($id_location)";
 $infoLocation = $db->select($sqlLocationInfo);
 date_default_timezone_set('America/Mexico_City');
-// Obtener la fecha actual + 2 días
 $fechaDev = date("d/m/Y", strtotime("+2 days"));
 ?>
 <!DOCTYPE html>
@@ -38,7 +37,7 @@ $fechaDev = date("d/m/Y", strtotime("+2 days"));
       <head>
         <?php include_once('head.php');?>
          <script src="<?php echo BASE_URL;?>/assets/js/whatsapp.js?version=<?php echo time(); ?>"></script>
-         <link rel="stylesheet" href="<?php echo BASE_URL;?>/assets/css/waba.css"/>
+         <link rel="stylesheet" href="<?php echo BASE_URL;?>/assets/css/waba.css?version=<?php echo time(); ?>"/>
       </head>
 	<body class="dashboard dashboard_1">
       <div class="full_container">
@@ -87,9 +86,9 @@ $fechaDev = date("d/m/Y", strtotime("+2 days"));
                                                     AND c.phone IN('$numero')
                                                     AND c.id_contact_status IN (1)
                                                     ORDER BY c.c_date DESC LIMIT 1";
-                                                    $rstCheck = $db->select($sqlGetContac);
+                                                    $rstCheck    = $db->select($sqlGetContac);
     			                                       $contact_name = $rstCheck[0]['contact_name'] ?? 0;
-                                                    $locId = $rstCheck[0]['id_location'] ?? 0;
+                                                    $locId       = $rstCheck[0]['id_location'] ?? 0;
                                                     //$ubicacion = ($locId==1)? 'Tlaquiltenango':' Zacatepec';
                                                     if($locId==$id_location){
                                                    $numero = substr($chat['sender_phone'], 3); ?>
@@ -137,7 +136,8 @@ $fechaDev = date("d/m/Y", strtotime("+2 days"));
                         <!-- Barra para escribir mensaje -->
                         <div class="chat-input-area">
                            <input type="text" class="chat-input" id="chat-input" placeholder="Escribe un mensaje...">
-                           <button class="btn-send" id="btn-send"><i class="fa fa-paper-plane"></i></button>
+                           <button class="btn-send" id="btn-send" data-toggle="tooltip" data-placement="top" title="" data-original-title="Enviar mensaje"><i class="fa fa-paper-plane"></i></button>
+                           <button class="btn-read" id="btn-read" data-toggle="tooltip" data-placement="top" title="" data-original-title="Marcar como leido"><i class="fa fa-check-circle"></i></button>
                         </div>
                      </div>
                   </div>
