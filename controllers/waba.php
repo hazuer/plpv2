@@ -1,14 +1,13 @@
 <?php
 session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+#error_reporting(E_ALL);
+#ini_set('display_errors', '1');
 // Cambia el límite de ejecución a 600 segundos (10 minutos)
 ini_set('max_execution_time', 800);
 set_time_limit(800);
 ini_set('memory_limit', '512M');
 
 define( '_VALID_MOS', 1 );
-date_default_timezone_set('America/Mexico_City');
 
 require_once('../includes/configuration.php');
 require_once('../includes/DBW.php');
@@ -16,7 +15,7 @@ $db = new DB(HOST,USERNAME,PASSWD,DBNAME,PORT,SOCKET);
 
 header('Content-Type: application/json; charset=utf-8');
 
-$wabaPhone='5217344093961';
+
 switch ($_POST['option']) {
 	case 'sendTemplate':
 		$result   = [];
@@ -34,6 +33,8 @@ switch ($_POST['option']) {
 		$field6        = $_POST['field6'];
 		$txtTemplate   = $_POST['txtTemplate'];
 		$tokenWaba     = $_POST['tokenWaba'];
+		$wabaPhone     = $_POST['phoneWaba'];
+		$phoneNumberId = $_POST['phoneNumberId'];
 
 		$idParceIn = ($mbIdCatParcel==99) ? '1,2,3': $mbIdCatParcel;
 		$number    = $_POST['number']; // Solo un número
@@ -106,7 +107,7 @@ switch ($_POST['option']) {
 				]
 			];
 
-			$url = "https://graph.facebook.com/v23.0/683077594899877/messages";
+			$url = "https://graph.facebook.com/v23.0/".$phoneNumberId."/messages";
 			$ch = curl_init($url);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($ch, CURLOPT_POST, true);
@@ -175,6 +176,7 @@ switch ($_POST['option']) {
 
 	case 'getAllMessagesToRead':
 		$phone = $_POST['phone'] ?? '';
+		$wabaPhone     = $_POST['phoneWaba'];
 
 		if (!$phone) {
 			echo json_encode([]);
@@ -223,13 +225,15 @@ switch ($_POST['option']) {
 		$tophone    = $_POST['tophone'] ?? '';
 		$msj        = $_POST['msj'] ?? '';
 		$tokenWaba  = $_POST['tokenWaba'];
+		$wabaPhone  = $_POST['phoneWaba'];
+		$phoneNumberId = $_POST['phoneNumberId'];
 
 		if (empty($tophone) || empty($msj)) {
 			echo json_encode(['success' => false, 'message' => 'Faltan datos.']);
 			exit;
 		}
 
-		$url = "https://graph.facebook.com/v23.0/683077594899877/messages";
+		$url = "https://graph.facebook.com/v23.0/".$phoneNumberId."/messages";
 
 		$payload = [
 			"messaging_product" => "whatsapp",

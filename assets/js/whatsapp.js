@@ -2,53 +2,197 @@ $(document).ready(function() {
 	let baseController = 'controllers/waba.php';
     let idLocationSelected = $('#option-location');
 
-    $('#btn-send').click(function(){
-        sendwts();
-    });
-
-    $('#chat-input').on('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault(); // evita que haga salto de línea si es textarea
-            sendwts();
-        }
-    });
-
-	function sendwts() {
-		 let tophone = $('#tophone').val();
-    let msj = $('#chat-input').val();
-
-    $.ajax({
-        url: baseController,
-        method: "POST",
-        data: {
-            action: 'sendMessage',
-            tophone: tophone,
-            msj: msj,
-            tokenWaba: $("#tokenWaba").val(),
-            option:'sendMessage'
-        },
-        dataType: 'json',
-        beforeSend: function() {
-            showSwal('Enviando mensaje', 'Espere por favor...');
-            $('.swal-button-container').hide();
-        },
-        success: function(response) {
-            swal.close();
-            if (response.success) {
-                //console.log("Mensaje enviado:", response);
-                $('#chat-input').val('');
-                // ✅ Opcional: recargar mensajes
-                //loadChatMessages(tophone);
-            } else {
-                swal("Error", response.message, "error");
+      	let table = $('#tbl-msj-whats').DataTable({
+		"language": {
+            processing: "Procesando...",
+            search: "Buscar:",
+            lengthMenu: "Mostrar _MENU_ registros",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+            infoEmpty: "Mostrando 0 a 0 de 0 registros",
+            infoFiltered: "(filtrado de _MAX_ registros totales)",
+            loadingRecords: "Cargando...",
+            zeroRecords: "No se encontraron resultados",
+            emptyTable: "No hay datos disponibles en la tabla",
+            paginate: {
+                first: "Primero",
+                previous: "Anterior",
+                next: "Siguiente",
+                last: "Último"
+            },
+            aria: {
+                sortAscending: ": Activar para ordenar la columna de forma ascendente",
+                sortDescending: ": Activar para ordenar la columna de forma descendente"
             }
         },
-        error: function(xhr) {
-            swal.close();
-            swal("Error", "Hubo un problema al enviar el mensaje.", "error");
-        }
+		"bPaginate": true,
+		"lengthMenu": [[10, 50, 100, -1], [10, 50, 100, "All"]], // Definir las opciones de longitud del menú
+        "pageLength": 500, // Establecer el número de registros por página predeterminado
+        "bInfo" : true,
+		scrollCollapse: true,
+		scroller: true,
+		scrollY: 450,
+		scrollX: true,
+		dom: 'Bfrtip',
+		buttons: [
+			'excel'
+		],
+		"columns" : [
+			{title: `Telefono`,               name:`sender_phone`,       data:`sender_phone`},      //0
+			{title: `Contacto`,        name:`contact_name`,    data:`contact_name`},   //1
+			{title: `Último mensaje`,       name:`last_message`,      data:`last_message`},     //2
+			{title: `Fecha mensaje`,   name:`last_date`,   data:`last_date`},  //3
+            {title: `opc`,   name:`opc`,   data:`opc`},  //3
+		],
+        "columnDefs": [
+			// { "width": "40%", "targets": [1,2] }
+		],
+        'order': [[3, 'asc']]
+	});
+
+	//funcion para borrar campo de busqueda
+	let clearButton = $(`<span id="clear-search" style="cursor: pointer;">&nbsp;<i class="fa fa-eraser fa-lg" aria-hidden="true"></i></span>`);
+	clearButton.click(function() {
+		$("#tbl-msj-whats_filter input[type='search']").val("");
+		setTimeout(function() {
+			$("#tbl-msj-whats_filter input[type='search']").trigger('mouseup').focus();
+		}, 100);
+	});
+	$("#tbl-msj-whats_filter label").append(clearButton);
+
+
+    // 👉 Función que carga los mensajes
+    function cargarMensajes(tophone, phoneWaba) {
+        console.log(tophone, phoneWaba);
+        $.ajax({
+            url: `${base_url}/${baseController}`,
+            type: 'POST',
+            data: { 
+                phone: tophone, 
+                phoneWaba: phoneWaba,
+                option: 'getAllMessagesToRead' 
+            },
+            dataType: 'json',
+            beforeSend: function() {
+                showSwal('Cargando mensajes', 'Espere por favor...');
+                $('.swal-button-container').hide();
+            },
+            success: function(mensajes) {
+                let html = '';
+                if (mensajes.length > 0) {
+                    mensajes.forEach(msg => {
+                        const myNumber = phoneWaba;
+                        let tipo = (msg.sender_phone === myNumber) ? 'sent' : 'received';
+                        let fechaHora = new Date(msg.datelog.replace(' ', 'T')).toLocaleString([], {
+                            weekday: 'short',
+                            day: '2-digit',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        html += `<div class="chat-bubble ${tipo}">
+                                    ${msg.message_text}
+                                    <span class="time">${fechaHora}</span>
+                                </div>`;
+                    });
+                } else {
+                    html = "<p style='text-align:center;color:#777;'>No hay mensajes.</p>";
+                }
+
+                $('#chat-container').html(html);
+                $('#chat-container').scrollTop($('#chat-container')[0].scrollHeight);
+                swal.close();
+                setTimeout(() => $('#chat-input').focus(), 600);
+            },
+            error: function(xhr, status, error) {
+                swal.close();
+                console.error("Error al cargar mensajes:", error);
+            }
         });
-	}
+    }
+
+
+
+let chatInterval = null; // 👉 Variable global para controlar el intervalo
+
+// Abrir modal de chat
+$(`#tbl-msj-whats tbody`).on('click', '#btn-read-w', function () {
+    let row = table.row($(this).closest('tr')).data();
+    $("#tophone").val(row.sender_phone);
+    let tophone = $("#tophone").val();
+    let phoneWaba = $("#phone_waba").val();
+
+    cargarMensajes(tophone, phoneWaba);
+
+    $('#modal-chat-w-title').html(`${row.sender_phone} - ${row.contact_name}`);
+    $('#modal-chat-w').modal({backdrop: 'static', keyboard: false}, 'show');
+
+    // 👉 Iniciar recarga automática cada 15 segundos
+    if (chatInterval) clearInterval(chatInterval); // por si ya estaba corriendo
+    chatInterval = setInterval(function() {
+        cargarMensajes(tophone, phoneWaba);
+    }, 15000);
+});
+
+// Cerrar modal
+$('#btn-close-chatw, #btn-close-chatw-1').click(function(){
+    if (chatInterval) {
+        clearInterval(chatInterval); // 👉 Detener recarga automática
+        chatInterval = null;
+    }
+    window.location.reload();
+});
+
+// Enviar mensaje
+$('#btn-send').on('click', function() {
+    sendWhats();
+});
+
+function sendWhats(){
+    console.log('okas clic');
+    let tophone = $("#tophone").val();
+    let tokenWaba = $("#tokenWaba").val();
+    let phoneWaba = $("#phone_waba").val();
+    let phoneNumberId = $("#phone_number_id").val();
+    let mensaje = $("#chat-input").val();
+
+    if(mensaje.trim() !== '') {
+        $.ajax({
+            url: `${base_url}/${baseController}`,
+            type: 'POST',
+            data: { 
+                tophone: tophone, 
+                tokenWaba: tokenWaba,
+                phoneWaba: phoneWaba,
+                msj: mensaje,
+                phoneNumberId: phoneNumberId,
+                option: 'sendMessage' 
+            },
+            success: function(response) {
+                console.log(response);
+                $("#chat-input").val('');
+                console.log('mensaje enviado');
+                // 👉 Refrescar mensajes inmediatamente después de enviar
+                cargarMensajes(tophone, phoneWaba);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error al enviar mensaje:", error);
+            }
+        });
+    }
+}
+
+// Enviar con Enter
+$('#chat-input').on('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault(); 
+        sendWhats();
+    }
+});
+
+
+
+
+
 
     	//--------------
 	$('#waba-template').click(function(){
@@ -145,6 +289,8 @@ Te compartimos los datos de tu pedido: folios_db.
             let texto = $("#preview-template").text();
             formData.append('txtTemplate', texto);
             formData.append('tokenWaba', $("#tokenWaba").val());
+            formData.append('phoneWaba', $("#phone_waba").val());
+            formData.append('phoneNumberId', $("#phone_number_id").val());
             formData.append('option', 'sendTemplate');
 
             $.ajax({
@@ -182,60 +328,6 @@ Te compartimos los datos de tu pedido: folios_db.
 
         enviarSiguiente();
     });
-
-
-$(document).on('click', '.chat-item', function() {
-    let phone = $(this).data('phone'); // data-phone en el <li>
-    
-    $.ajax({
-        url: `${base_url}/${baseController}`,
-        type: 'POST',
-        data: { phone: phone, option: 'getAllMessagesToRead' },
-        dataType: 'json',
-        beforeSend: function() {
-            showSwal('Cargando mensajes', 'Espere por favor...');
-            $('.swal-button-container').hide();
-        },
-        success: function(mensajes) {
-            let html = '';
-            
-            if (mensajes.length > 0) {
-                $("#tophone").val(phone);
-                //console.log('ok mensajes');
-                mensajes.forEach(msg => {
-                    console.log(msg);
-                    const myNumber = '5217344093961'; // tu número WABA
-                let tipo = (msg.sender_phone === myNumber) ? 'sent' : 'received';
-                    let fechaHora = new Date(msg.datelog.replace(' ', 'T')).toLocaleString([], {
-                        weekday: 'short',  // ej: "lun"
-                        day: '2-digit',    // ej: "03"
-                        month: 'short',    // ej: "sep"
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                    html += `<div class="chat-bubble ${tipo}">
-                                ${msg.message_text}
-                                <span class="time">${fechaHora}</span>
-                             </div>`;
-                });
-            } else {
-                html = "<p style='text-align:center;color:#777;'>No hay mensajes.</p>";
-            }
-
-            $('#chat-container').html(html);
-
-            // ✅ Scroll al final
-            $('#chat-container').scrollTop($('#chat-container')[0].scrollHeight);
-
-            // ✅ Cierra SweetAlert después de cargar mensajes
-            swal.close();
-        },
-        error: function(xhr, status, error) {
-            swal.close();
-            console.error("Error al cargar mensajes:", error);
-        }
-    });
-});
 
 
     $('#btn-read').click(function(){

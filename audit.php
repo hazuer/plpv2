@@ -183,7 +183,7 @@ foreach ($lineasTat as $linea) {
 											<tr>
 												<th>id_package</th>
 												<th>location_desc</th>
-												<th>parcel_desc
+												<th>parcel_desc</th>
 												<th>fecha_registro</th>
 												<th>registrado_por</th>
 												<th>guia</th>

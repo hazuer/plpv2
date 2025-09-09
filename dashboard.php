@@ -44,6 +44,7 @@ $tpre = $db->select($sqlpre);
 		<script type="text/javascript" src="<?php echo BASE_URL;?>/assets/js/libraries/dataTables.checkboxes.min.js"></script>
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="<?php echo BASE_URL;?>/assets/js/dashboard.js?version=<?php echo time(); ?>"></script>
         <style>
 .counter_no:hover,
 .counter_no:hover .couter_icon {
@@ -160,6 +161,7 @@ $tpre = $db->select($sqlpre);
                                                     ORDER BY cc.contact_name;
                                                     ";
                                                     $phonesWabaUnicos = $db->select($sql);
+                                                    #var_dump($phonesWabaUnicos);
 
                                                    $uniquePhones = [];
                                                     $seenMessages = [];
@@ -175,7 +177,7 @@ $tpre = $db->select($sqlpre);
                                                     
                                                     ?>
   
-                                                    <table id="tbl-reports" class="table table-striped table-hover" cellspacing="0" style="width:100%">
+                                                    <table id="tbl-msj-whats" class="table table-striped table-hover" cellspacing="0" style="width:100%">
 										<thead class="thead-dark"><tr>
                                                             <th>ID Package</th>
                                                             <th>Phone</th>
@@ -203,6 +205,20 @@ $tpre = $db->select($sqlpre);
                                                         $statusRow = $db->select($sqlWabaStatus);
 
                                                         $statusName = $statusRow ? $statusRow[0]['status_name'] : 'SIN ESTATUS';
+                                                        if($statusName=='failed'){
+                                                            /*$sqlLogger = "INSERT INTO logger 
+                                                            (datelog, id_package, id_user, new_id_status, old_id_status, desc_mov) 
+                                                            VALUES 
+                                                            ('$nDate', $id_package, $n_user_id, $newStatusPackage, $id_estatus, 'Envío de Mensaje WABA, '".$message_id.")";
+                                                            $db->sqlPure($sqlLogger, false);
+
+                                                        $sqlUpdatePackage = "UPDATE package SET 
+                                                        n_date = '$nDate', n_user_id = '$n_user_id', id_status=$newStatusPackage 
+                                                        WHERE id_package IN ($id_package)";
+                                                        $db->sqlPure($sqlUpdatePackage, false);*/
+
+                                                        }
+
                                                         $statusDate = $statusRow ? $statusRow[0]['datelog'] : '-';
 
                                                        

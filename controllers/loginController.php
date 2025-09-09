@@ -4,7 +4,6 @@ session_start();
 # error_reporting(E_ALL);
 
 define( '_VALID_MOS', 1 );
-date_default_timezone_set('America/Mexico_City');
 
 require_once('../includes/configuration.php');
 require_once('../includes/DB.php');

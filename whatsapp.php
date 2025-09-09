@@ -29,17 +29,28 @@ $chats = $db->select($sql);
 #Template
 $sqlLocationInfo ="SELECT * FROM cat_location WHERE id_location IN($id_location)";
 $infoLocation = $db->select($sqlLocationInfo);
-date_default_timezone_set('America/Mexico_City');
 $fechaDev = date("d/m/Y", strtotime("+2 days"));
 ?>
 <!DOCTYPE html>
 <html lang="es-MX">
       <head>
-        <?php include_once('head.php');?>
+         <?php include_once('head.php');?>
+         <link href="<?php echo BASE_URL;?>/assets/css/libraries/jquery.dataTables.min.css" rel="stylesheet">
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/jquery.dataTables.min.js"></script>
+
+		<link href="<?php echo BASE_URL;?>/assets/css/libraries/buttons.dataTables.min.css" rel="stylesheet">
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/dataTables.buttons.min.js"></script>
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/jszip.min.js"></script>
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/pdfmake.min.js"></script>
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/vfs_fonts.js"></script>
+		<script src="<?php echo BASE_URL;?>/assets/js/libraries/buttons.html5.min.js"></script>
+		<link type="text/css" href="<?php echo BASE_URL;?>/assets/css/libraries/dataTables.checkboxes.css" rel="stylesheet"/>
+		<script type="text/javascript" src="<?php echo BASE_URL;?>/assets/js/libraries/dataTables.checkboxes.min.js"></script>
+
+      <link rel="stylesheet" href="<?php echo BASE_URL;?>/assets/css/waba.css?version=<?php echo time(); ?>"/>
          <script src="<?php echo BASE_URL;?>/assets/js/whatsapp.js?version=<?php echo time(); ?>"></script>
-         <link rel="stylesheet" href="<?php echo BASE_URL;?>/assets/css/waba.css?version=<?php echo time(); ?>"/>
       </head>
-	<body class="dashboard dashboard_1">
+<body class="dashboard dashboard_1"><body class="dashboard dashboard_1">
       <div class="full_container">
          <div class="inner_container">
             <!-- Sidebar  -->
@@ -53,103 +64,92 @@ $fechaDev = date("d/m/Y", strtotime("+2 days"));
                <!-- dashboard inner -->
                <div class="midde_cont">
                   <div class="container-fluid">
-                     <div class="row column_title">
+                    <div class="row column_title">
                         <div class="col-md-12">
                            <div class="page_title">
                               <h2>Mensajes nuevos <?php echo $id_location.'-'.$desc_loc;?></h2>
                            </div>
                         </div>
                      </div>
-                  </div>
-				  <div class="row column4 graph">
-                        <div class="col-md-4">
-                           <div class="white_shd full margin_bottom_30" style="display: block !important;">
-                              <div class="full graph_head">
-                                 <div class="heading1 margin_0">
-                                    <h2>Todos</h2>
-                                 </div>
-                              </div>
-                              <div class="full progress_bar_inner">
-                                 <div class="row">
-                                    <div class="col-md-12">
-                                       <div class="msg_section">
-                                          <div class="msg_list_main">
-                                          <ul class="msg_list" id="chat-list">
-                                             <?php foreach ($chats as $chat): 
-                                             $numero = substr($chat['sender_phone'], 3);
-                                               $sqlGetContac="SELECT 
-                                                    c.id_location,
-                                                    c.contact_name 
-                                                    FROM cat_contact c 
-                                                    WHERE 
-                                                    c.id_location IN ($id_location) 
-                                                    AND c.phone IN('$numero')
-                                                    AND c.id_contact_status IN (1)
-                                                    ORDER BY c.c_date DESC LIMIT 1";
-                                                    $rstCheck    = $db->select($sqlGetContac);
-    			                                       $contact_name = $rstCheck[0]['contact_name'] ?? 0;
-                                                    $locId       = $rstCheck[0]['id_location'] ?? 0;
-                                                    //$ubicacion = ($locId==1)? 'Tlaquiltenango':' Zacatepec';
-                                                    if($locId==$id_location){
-                                                   $numero = substr($chat['sender_phone'], 3); ?>
-                                                   <li class="chat-item" data-phone="<?php echo $chat['sender_phone']?>">
-                                                      <span>
-                                                         <span class="name_user"><?php echo $numero.'<br>'.$contact_name; ?></span>
-                                                         <span class="msg_user"><?php echo htmlspecialchars($chat['last_message']); ?></span>
-                                                         <span class="time_ago"><?php $formatter = new IntlDateFormatter(
-                                                                                 'es_ES',
-                                                                                 IntlDateFormatter::FULL,
-                                                                                 IntlDateFormatter::SHORT,
-                                                                                 'America/Mexico_City',
-                                                                                 IntlDateFormatter::GREGORIAN,
-                                                                                 'EEE, dd MMM, HH:mm'
-                                                                              );
-                                                                              echo $formatter->format(strtotime($chat['last_date'])); ?></span>
-                                                      </span>
-                                                   </li>
-                                             <?php 
-                                                   }
-                                          endforeach; ?>
-                                          </ul>
-                                       </div>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                  
-						<!-- --------------- -->
-                  <div class="col-md-8 chat-wrapper">
-                     <div class="white_shd full margin_bottom_30" style="display: block !important;">
-                        <div class="full graph_head">
-                           <div class="heading1 margin_0">
-                              <h2><input type="text" id="tophone" value="" readonly>
-                           <input type="text" id="tokenWaba" value="<?php echo $infoLocation[0]['token']?>" readonly></h2>
-                           </div>
-                        </div>
+                     <!-- row -->
+                     <div class="row">
+                        <!-- table section -->
+                        <div class="col-md-12">
+                           <div class="white_shd full margin_bottom_30">
 
-                        <!-- Contenedor conversación -->
-                        <div class="full progress_bar_inner chat-container" id="chat-container">
-                           <p style="text-align:center;color:#777;">Selecciona un chat para ver los mensajes.</p>
-                        </div>
-                        <!-- Barra para escribir mensaje -->
-                        <div class="chat-input-area">
-                           <input type="text" class="chat-input" id="chat-input" placeholder="Escribe un mensaje...">
-                           <button class="btn-send" id="btn-send" data-toggle="tooltip" data-placement="top" title="" data-original-title="Enviar mensaje"><i class="fa fa-paper-plane"></i></button>
-                           <button class="btn-read" id="btn-read" data-toggle="tooltip" data-placement="top" title="" data-original-title="Marcar como leido"><i class="fa fa-check-circle"></i></button>
+                              <div class="table_section padding_infor_info">
+                                 <div class="table-responsive-sm">
+									<table id="tbl-msj-whats" class="table table-striped table-hover" cellspacing="0" style="width:100%">
+										<thead class="thead-dark">
+											<tr>
+                                    <th>sender_phone</th>
+												<th>contact_name</th>
+												<th>last_message</th>
+												<th>last_date</th>
+                                    <th>opc</th>
+											</tr>
+										</thead>
+										<tbody>
+										<?php foreach($chats as $chat):
+                              $numero = substr($chat['sender_phone'], 3);
+                               $sqlGetContac="SELECT 
+                                 c.id_location,
+                                 c.contact_name 
+                                 FROM cat_contact c 
+                                 WHERE 
+                                 c.id_location IN ($id_location) 
+                                 AND c.phone IN('$numero')
+                                 AND c.id_contact_status IN (1)
+                                 ORDER BY c.c_date DESC LIMIT 1";
+                                 $rstCheck    = $db->select($sqlGetContac);
+                                 $contact_name = $rstCheck[0]['contact_name'] ?? 0;
+                                 $locId       = $rstCheck[0]['id_location'] ?? 0;
+                                 if($locId==$id_location){
+                                    $numero = substr($chat['sender_phone'], 3);
+                                    $formatter = new IntlDateFormatter(
+                                    'es_ES',
+                                    IntlDateFormatter::FULL,
+                                    IntlDateFormatter::SHORT,
+                                    'America/Mexico_City',
+                                    IntlDateFormatter::GREGORIAN,
+                                    'EEE, dd MMM, HH:mm'
+                                 );
+                                 $last_date= $formatter->format(strtotime($chat['last_date']));
+											?>
+											<tr>
+											<td><?php echo $chat['sender_phone'] ?></td>
+											<td><?php echo $contact_name; ?></td>
+											<td><?php echo htmlspecialchars($chat['last_message']); ?></td>
+											<td><?php echo $last_date; ?></td>
+                                 <td style="text-align: center;">
+													<div class="row">
+														<div class="col-md-4">
+															<span class="badge badge-pill badge-info" style="cursor: pointer;" id="btn-read-w" title="Editar">
+																<i class="fa fa-paper-plane fa-lg" aria-hidden="true"></i>
+															</span>
+														</div>
+													</div>
+												</td>
+											</tr>
+											<?php }
+                               endforeach; ?>
+										</tbody>
+									</table>
+
+                                 </div>
+                              </div>
+                           </div>
                         </div>
                      </div>
                   </div>
-						<!-- --------------- -->
-						
-                     </div>
+         
                </div>
                <!-- end dashboard inner -->
             </div>
          </div>
       </div>
       <?php
+	  	   include('modal/chat-w.php');
          require_once('modal/waba-template.php');
       	require_once('footer.php');
       ?>
