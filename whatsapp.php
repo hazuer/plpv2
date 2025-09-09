@@ -50,7 +50,7 @@ $fechaDev = date("d/m/Y", strtotime("+2 days"));
       <link rel="stylesheet" href="<?php echo BASE_URL;?>/assets/css/waba.css?version=<?php echo time(); ?>"/>
          <script src="<?php echo BASE_URL;?>/assets/js/whatsapp.js?version=<?php echo time(); ?>"></script>
       </head>
-<body class="dashboard dashboard_1"><body class="dashboard dashboard_1">
+   <body class="dashboard dashboard_1"><body class="dashboard dashboard_1">
       <div class="full_container">
          <div class="inner_container">
             <!-- Sidebar  -->

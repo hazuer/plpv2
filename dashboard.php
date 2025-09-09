@@ -9,7 +9,6 @@ require_once('includes/session.php');
 
 $id_location = $_SESSION['uLocation'];
 
-
 # total de paquetes
 $sql = "SELECT 
 p.id_package 
@@ -195,8 +194,7 @@ $tpre = $db->select($sqlpre);
                                                     foreach ($uniquePhones as $item) {
                                                         // Buscar último estatus de este message_id
                                                         $msgId = $item['message_id'];
-                                                        $sqlWabaStatus = "
-                                                            SELECT status_name, datelog 
+                                                        $sqlWabaStatus = "SELECT status_name, datelog 
                                                             FROM waba_status 
                                                             WHERE message_id = '".$msgId."' 
                                                             ORDER BY id_status DESC 

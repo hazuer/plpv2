@@ -84,13 +84,13 @@ $packages = $db->select($sql);
                      <!-- row -->
                      <div class="row">
                         <!-- table section -->
-                         <div class="col-md-12">
+                        <div class="col-md-12">
                            <div class="white_shd full margin_bottom_30">
 
                               <div class="table_section padding_infor_info">
                                  <div class="table-responsive-sm">
                                     		
-                                 <table id="tbl-msjs-waba"class="table table-striped table-hover" cellspacing="0" style="width:100%">
+                                 <table id="tbl-reports"class="table table-striped table-hover" cellspacing="0" style="width:100%">
 										<thead class="thead-dark">
 											<tr>
 												<th>id_package</th>

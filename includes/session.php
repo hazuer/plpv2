@@ -57,6 +57,7 @@ $sqlm="SELECT
 FROM 
     waba_callbacks 
 WHERE 
-    is_read = 0";
+    is_read = 0
+	AND id_location IN (".$_SESSION["uId"].")" ;
 $rsttmsl  = $db->select($sqlm);
 $totalMensajeSinLeer = $rsttmsl[0]['total_chats'];

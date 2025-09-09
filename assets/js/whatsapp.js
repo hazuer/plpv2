@@ -62,6 +62,7 @@ $(document).ready(function() {
 
     // 👉 Función que carga los mensajes
     function cargarMensajes(tophone, phoneWaba) {
+        let id_location = idLocationSelected.val();
         console.log(tophone, phoneWaba);
         $.ajax({
             url: `${base_url}/${baseController}`,
@@ -69,12 +70,13 @@ $(document).ready(function() {
             data: { 
                 phone: tophone, 
                 phoneWaba: phoneWaba,
+                id_location:id_location,
                 option: 'getAllMessagesToRead' 
             },
             dataType: 'json',
             beforeSend: function() {
-                showSwal('Cargando mensajes', 'Espere por favor...');
-                $('.swal-button-container').hide();
+                // showSwal('Cargando mensajes', 'Espere por favor...');
+                // $('.swal-button-container').hide();
             },
             success: function(mensajes) {
                 let html = '';
@@ -126,11 +128,11 @@ $(`#tbl-msj-whats tbody`).on('click', '#btn-read-w', function () {
     $('#modal-chat-w-title').html(`${row.sender_phone} - ${row.contact_name}`);
     $('#modal-chat-w').modal({backdrop: 'static', keyboard: false}, 'show');
 
-    // 👉 Iniciar recarga automática cada 15 segundos
+    // 👉 Iniciar recarga automática cada 10 segundos
     if (chatInterval) clearInterval(chatInterval); // por si ya estaba corriendo
     chatInterval = setInterval(function() {
         cargarMensajes(tophone, phoneWaba);
-    }, 15000);
+    }, 10000);
 });
 
 // Cerrar modal
@@ -149,6 +151,7 @@ $('#btn-send').on('click', function() {
 
 function sendWhats(){
     console.log('okas clic');
+    let id_location = idLocationSelected.val();
     let tophone = $("#tophone").val();
     let tokenWaba = $("#tokenWaba").val();
     let phoneWaba = $("#phone_waba").val();
@@ -160,6 +163,7 @@ function sendWhats(){
             url: `${base_url}/${baseController}`,
             type: 'POST',
             data: { 
+                id_location:id_location,
                 tophone: tophone, 
                 tokenWaba: tokenWaba,
                 phoneWaba: phoneWaba,
