@@ -1,7 +1,7 @@
 <?php
 session_start();
-#error_reporting(E_ALL);
-#ini_set('display_errors', '1');
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 
 define( '_VALID_MOS', 1 );
 
@@ -1464,6 +1464,14 @@ async function sendMessageWhats(client, chatId, fullMessage, iconBot) {
 			}
 		}
 
+		echo json_encode($result);
+	break;
+
+	case 'verifiedPackage':
+		$tracking     = $_POST['tracking'];
+		$is_verified  = $_POST['is_verified'];
+		$data['is_verified'] = $is_verified;
+		$result = $db->update('package',$data," `tracking` = '$tracking'");
 		echo json_encode($result);
 	break;
 }

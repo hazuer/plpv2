@@ -9,7 +9,9 @@ require_once('includes/session.php');
 
 			$id_location = $_SESSION['uLocation'];
 			$sql = "SELECT 
+				p.id_package,
 				p.tracking,
+				p.is_verified,
 				p.folio,
 				cc.contact_name receiver,
 				UPPER(SUBSTRING(TRIM(REPLACE(
@@ -64,7 +66,8 @@ require_once('includes/session.php');
 					'tracking' => $row['tracking'],
 					'folio'    => $folio,
 					'receiver' => $row['receiver'],
-					'marker'   => $row['marker']
+					'marker'   => $row['marker'],
+					'is_verified'   => $row['is_verified']
 				];
 			}
 			?>
@@ -72,18 +75,26 @@ require_once('includes/session.php');
 <html lang="es-MX">
 	<head>
 	<?php include_once('head.php');?>
-	<link href="<?php echo BASE_URL;?>/assets/css/libraries/jquery.dataTables.min.css" rel="stylesheet">
-	<script src="<?php echo BASE_URL;?>/assets/js/libraries/jquery.dataTables.min.js"></script>
+	<script src="<?php echo BASE_URL;?>/assets/js/admin.js?version=<?php echo time(); ?>"></script>
+	<style>
+		.checkbox-container {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr); /* Por defecto 2 columnas */
+		gap: 5px;
+		margin-top: 8px;
+		justify-items: center;  /* centra cada checkbox */
+		align-items: start;     /* los alinea arriba */
+		height: auto;           /* 🔑 evita el espacio vacío */
+		min-height: auto;       /* 🔑 elimina altura mínima */
+		}
 
-	<link href="<?php echo BASE_URL;?>/assets/css/libraries/buttons.dataTables.min.css" rel="stylesheet">
-	<script src="<?php echo BASE_URL;?>/assets/js/libraries/dataTables.buttons.min.js"></script>
-	<script src="<?php echo BASE_URL;?>/assets/js/libraries/jszip.min.js"></script>
-	<script src="<?php echo BASE_URL;?>/assets/js/libraries/pdfmake.min.js"></script>
-	<script src="<?php echo BASE_URL;?>/assets/js/libraries/vfs_fonts.js"></script>
-	<script src="<?php echo BASE_URL;?>/assets/js/libraries/buttons.html5.min.js"></script>
-	<link type="text/css" href="<?php echo BASE_URL;?>/assets/css/libraries/dataTables.checkboxes.css" rel="stylesheet"/>
-	<script type="text/javascript" src="<?php echo BASE_URL;?>/assets/js/libraries/dataTables.checkboxes.min.js"></script>
-
+		/* Cuando sea <= 425px cambia a 4 columnas */
+		@media (max-width: 425px) {
+		.checkbox-container {
+			grid-template-columns: repeat(4, 1fr);
+		}
+		}
+	</style>
 	</head>
 	<body class="dashboard dashboard_1"><body class="dashboard dashboard_1">
       <div class="full_container">
@@ -111,17 +122,25 @@ require_once('includes/session.php');
                         </div>
                      </div>
 
-					<div class="row ccolumn1 d-flex align-items-stretch">
-						<?php foreach ($groupedPackages as $initial => $packages): ?>
-							<div class="col-md-12 col-lg-4 d-flex">
-								<div class="full counter_section margin_bottom_30" style="display: block !important;">
-									<div style="text-align:center; font-size:14px; margin-top:10px;">
+					<div class="row ccolumn1">
+					<?php foreach ($groupedPackages as $initial => $packages): ?>
+						<div class="col-md-12 col-lg-4 d-flex">
+							<div class="card w-100 shadow-sm mb-4">
+
+								<!-- Cabecera -->
+								<div class="card-header text-center bg-light">
+									<h4 class="mb-0" style="font-weight:bold; font-size:28px; color:#333;">
+										<?php echo $initial; ?>:<?php echo count($packages); ?>
+									</h4>
+								</div>
+
+								<!-- Body (etiquetas JT, CN, IM) -->
+								<div class="card-body text-center">
+									<div class="d-flex justify-content-center flex-wrap gap-2">
 										<?php
-										// Contadores
 										$countJMX   = 0;
 										$countCN    = 0;
 										$countImile = 0;
-
 										foreach ($packages as $item) {
 											if (strpos($item['tracking'], 'JMX') === 0) {
 												$countJMX++;
@@ -132,43 +151,54 @@ require_once('includes/session.php');
 											}
 										}
 										?>
-									</div>
-									<div class="couter_icon">
-										<div>
-											<span style="font-size: 30px; font-weight: bold; color: #333;">
-												<?php echo $initial; ?>:<?php echo count($packages); ?>
+
+										<?php if($countJMX > 0): ?>
+											<span class="badge px-3 py-2" style="background:#f8d568; font-size:14px; font-weight:bold;">
+												JT: <?php echo $countJMX; ?>
 											</span>
-										</div>
-										<div class="d-flex justify-content-center gap-1" style="margin-top:10px;">
-											<?php if($countJMX > 0): ?>
-												<div style="background:#f8d568; padding:6px 12px; border-radius:8px; font-weight:bold;">JT: <?php echo $countJMX; ?></div>
-											<?php endif; ?>
+										<?php endif; ?>
 
-											<?php if($countCN > 0): ?>
-												<div style="background:#007bff; color:#fff; padding:6px 12px; border-radius:8px; font-weight:bold;">CN: <?php echo $countCN; ?></div>
-											<?php endif; ?>
+										<?php if($countCN > 0): ?>
+											<span class="badge px-3 py-2" style="background:#007bff; color:#fff; font-size:14px; font-weight:bold;">
+												CN: <?php echo $countCN; ?>
+											</span>
+										<?php endif; ?>
 
-											<?php if($countImile > 0): ?>
-												<div style="background:#03a9f4; color:#fff; padding:6px 12px; border-radius:8px; font-weight:bold;">IM: <?php echo $countImile; ?></div>
-											<?php endif; ?>
-										</div>
+										<?php if($countImile > 0): ?>
+											<span class="badge px-3 py-2" style="background:#03a9f4; color:#fff; font-size:14px; font-weight:bold;">
+												IM: <?php echo $countImile; ?>
+											</span>
+										<?php endif; ?>
 									</div>
+								</div>
 
-									<div class="row" style="margin-top: 15px;">
+								<!-- Footer (checkbox + folio) -->
+								<div class="card-footer bg-white border-0">
+									<div class="row">
 										<?php foreach ($packages as $package): ?>
-											<div class="col-4 col-sm-3 col-md-3 text-center" style="padding: 5px;" data-toggle="tooltip" data-placement="top" title="<?php echo $package['tracking'];?>-<?php echo $package['receiver'];?>">
-												<span style="color:<?php echo $package['marker'];?>; font-weight:bold;">
-													<input type="checkbox" autocomplete="off">
-													<?php echo $package['folio']; ?>
-												</span>
+											<div class="col-6 col-sm-4 col-md-3 col-xxs-3 text-center mb-2" 
+												data-toggle="tooltip" 
+												data-placement="top" 
+												title="<?php echo $package['tracking'];?>-<?php echo $package['receiver'];?>">
+												<div class="d-flex flex-column align-items-center" style="color:<?php echo $package['marker'];?>; font-weight:bold;">
+													<input 
+														type="checkbox" 
+														autocomplete="off" 
+														class="mb-1 chk-package" 
+														data-tracking="<?php echo $package['tracking']; ?>" 
+														<?php echo ($package['is_verified'] == 1) ? 'checked' : ''; ?>
+													>
+													<span><?php echo $package['folio']; ?></span>
+												</div>
 											</div>
 										<?php endforeach; ?>
 									</div>
-
 								</div>
+
 							</div>
-						<?php endforeach; ?>
-					</div>
+						</div>
+					<?php endforeach; ?>
+				</div>
 
 
                   </div>
