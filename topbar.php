@@ -99,9 +99,9 @@
             <div class="right_topbar">
                 <div class="icon_info">
                     <ul>
-                        <li><a href="#" id="btn-scan-qr"><i class="fa fa-qrcode fa-lg"></i></a></li>
-                        <li><a href="whatsapp.php"><i class="fa fa-comments-o fa-lg"></i><span class="badge online_animation"><?php
-                         //echo $totalMensajeSinLeer;
+                        <li><a href="#" id="btn-scan-qr"><i class="fa fa-qrcode blue1_color fa-lg"></i></a></li>
+                        <li><a href="whatsapp.php"><i class="fa fa-whatsapp green_color fa-lg"></i><span class="badge online_animation"><?php
+                         echo $totalMensajeSinLeer;
                         ?></span></a></li>
                     </ul>
                     <ul class="user_profile_dd">

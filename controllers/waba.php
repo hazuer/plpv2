@@ -1,7 +1,7 @@
 <?php
 session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+#error_reporting(E_ALL);
+#ini_set('display_errors', '1');
 // Cambia el límite de ejecución a 600 segundos (10 minutos)
 ini_set('max_execution_time', 800);
 set_time_limit(800);
@@ -52,10 +52,12 @@ switch ($_POST['option']) {
 			AND p.id_status IN (".$id_estatus.") 
 			AND cc.phone IN(".$number.") 
 			AND p.id_cat_parcel IN(".$idParceIn.") 
+			AND p.is_verified IN(1) 
 			GROUP BY cc.phone
 		";
 		$rst = $db->select($sql);
 		#var_dump($rst);
+		#die();
 
 		if(count($rst)>0){
 			$ids             = $rst[0] ? $rst[0]['ids'] : 0;
@@ -145,26 +147,26 @@ switch ($_POST['option']) {
 			$nDate   = date('Y-m-d H:I:s');
 			foreach ($listIds as $id_package) {
 			//var_dump('id_package',$id_package);
-				echo $sqlSaveNotification = "INSERT INTO notification 
+				$sqlSaveNotification = "INSERT INTO notification 
 				(id_location,n_date,n_user_id,message,id_contact_type,sid,id_package,message_id) 
 				VALUES 
 				($id_location,'$nDate',$n_user_id,'$fullTemplate',$id_contact_type,'$fullLog',$id_package,'$message_id')";
 				$db->sqlPure($sqlSaveNotification, false);
 
-				echo $sqlLogger = "INSERT INTO logger 
+				$sqlLogger = "INSERT INTO logger 
 				(datelog, id_package, id_user, new_id_status, old_id_status, desc_mov) 
 				VALUES 
-				('$nDate', $id_package, $n_user_id, $newStatusPackage, $id_estatus, 'Envío de Mensaje WABA, '".$message_id.")";
+				('$nDate', $id_package, $n_user_id, $newStatusPackage, $id_estatus, 'Envío de Mensaje WABA, ".$message_id."')";
 				$db->sqlPure($sqlLogger, false);
 
-				echo $sqlUpdatePackage = "UPDATE package SET 
+				$sqlUpdatePackage = "UPDATE package SET 
 				n_date = '$nDate', n_user_id = '$n_user_id', id_status=$newStatusPackage 
 				WHERE id_package IN ($id_package)";
 				$db->sqlPure($sqlUpdatePackage, false);
 
 				$date    = date("Y-m-d H:i:s");
 				$read_by = intval($_SESSION['uId']);
-				echo $sql = "INSERT INTO waba_callbacks (datelog, sender_phone, message_id, message_text, raw_json,is_read,read_at,read_by,source,id_location) 
+				$sql = "INSERT INTO waba_callbacks (datelog, sender_phone, message_id, message_text, raw_json,is_read,read_at,read_by,source,id_location) 
 				VALUES ('$date', '$wabaPhone', '$message_id', '$fullTemplate', '$response',1,'$date', $read_by, 'template',$id_location)";
 				$inserted = $db->sqlPure($sql, false);
 			}

@@ -56,7 +56,7 @@ switch ($_SESSION["uId"]) {
             <a href="packages.php" class="onclikload"><i class="fa fa-cubes blue1_color"></i> <span>Paquetes</span></a>
          </li>
          <li>
-            <a href="whatsapp.php" class="onclikload"><i class="fa fa-paper-plane green_color"></i> <span>WhatsApp</span></a>
+            <a href="whatsapp.php" class="onclikload"><i class="fa fa-whatsapp green_color"></i> <span>WhatsApp</span></a>
          </li>
 		 <li>
             <a href="reports.php" class="onclikload"><i class="fa fa-bar-chart purple_color"></i> <span>Reportes</span></a>

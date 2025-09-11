@@ -114,7 +114,7 @@ $tpre = $db->select($sqlpre);
                                         <a href="whatsapp.php" class="counter_no">
                                     <div class="couter_icon">
                                             <div>
-                                                <i class="fa fa-comments-o green_color"></i>
+                                                <i class="fa fa-whatsapp green_color"></i>
                                             </div>
                                         </div>
                                         <div class="counter_no">
@@ -197,7 +197,7 @@ $tpre = $db->select($sqlpre);
                                                         $sqlWabaStatus = "SELECT status_name, datelog 
                                                             FROM waba_status 
                                                             WHERE message_id = '".$msgId."' 
-                                                            ORDER BY id_status DESC 
+                                                            ORDER BY FIELD(status_name, 'read', 'delivered', 'sent'), id_status DESC 
                                                             LIMIT 1
                                                         ";
                                                         $statusRow = $db->select($sqlWabaStatus);

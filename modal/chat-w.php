@@ -9,10 +9,10 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                        <input type="text" id="tophone" value="" readonly>
-                        <input type="text" id="tokenWaba" value="<?php echo $infoLocation[0]['token']?>" readonly>
-                        <input type="text" id="phone_waba" value="<?php echo $infoLocation[0]['phone_waba']?>" readonly>
-                        <input type="text" id="phone_number_id" value="<?php echo $infoLocation[0]['phone_number_id']?>" readonly>
+                        <input type="hidden" id="tophone" value="" readonly>
+                        <input type="hidden" id="tokenWaba" value="<?php echo $infoLocation[0]['token']?>" readonly>
+                        <input type="hidden" id="phone_waba" value="<?php echo $infoLocation[0]['phone_waba']?>" readonly>
+                        <input type="hidden" id="phone_number_id" value="<?php echo $infoLocation[0]['phone_number_id']?>" readonly>
                 </div>
                 <div class="row">
                     <div class="col-md-12">

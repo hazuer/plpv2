@@ -63,7 +63,7 @@ $(document).ready(function() {
     // 👉 Función que carga los mensajes
     function cargarMensajes(tophone, phoneWaba) {
         let id_location = idLocationSelected.val();
-        console.log(tophone, phoneWaba);
+        // console.log(tophone, phoneWaba);
         $.ajax({
             url: `${base_url}/${baseController}`,
             type: 'POST',
@@ -101,17 +101,26 @@ $(document).ready(function() {
                 }
 
                 $('#chat-container').html(html);
-                $('#chat-container').scrollTop($('#chat-container')[0].scrollHeight);
-                swal.close();
-                setTimeout(() => $('#chat-input').focus(), 600);
+               /*setTimeout(() => {
+                    $('#chat-container').scrollTop($('#chat-container')[0].scrollHeight);
+                    $('#chat-input').focus();
+                }, 300);*/
             },
             error: function(xhr, status, error) {
-                swal.close();
                 console.error("Error al cargar mensajes:", error);
             }
         });
     }
 
+    $('#modal-chat-w').on('shown.bs.modal', function () {
+    /*let chat = $('#chat-container');
+    chat.scrollTop(chat[0].scrollHeight);
+    $('#chat-input').focus();*/
+    setTimeout(() => {
+        $('#chat-container').scrollTop($('#chat-container')[0].scrollHeight);
+        //$('#chat-input').focus();
+    }, 1300);
+});
 
 
 let chatInterval = null; // 👉 Variable global para controlar el intervalo
@@ -125,8 +134,13 @@ $(`#tbl-msj-whats tbody`).on('click', '#btn-read-w', function () {
 
     cargarMensajes(tophone, phoneWaba);
 
+
     $('#modal-chat-w-title').html(`${row.sender_phone} - ${row.contact_name}`);
     $('#modal-chat-w').modal({backdrop: 'static', keyboard: false}, 'show');
+    setTimeout(() => {
+                    $('#chat-container').scrollTop($('#chat-container')[0].scrollHeight);
+                    $('#chat-input').focus();
+                }, 600);
 
     // 👉 Iniciar recarga automática cada 10 segundos
     if (chatInterval) clearInterval(chatInterval); // por si ya estaba corriendo
@@ -192,7 +206,6 @@ $('#chat-input').on('keydown', function(e) {
         sendWhats();
     }
 });
-
 
 
 
@@ -349,9 +362,12 @@ Te compartimos los datos de tu pedido: folios_db.
             dataType: 'json',
             success: function(response) {
                 swal("Éxito", "Mensajes leidos", "success");
+                setTimeout(function(){
+						swal.close();
+						window.location.reload();
+					}, 1500);
             },
             error: function(xhr) {
-                swal.close();
                 swal("Error", "Error al actualizar lectura.", "error");
             }
         });
