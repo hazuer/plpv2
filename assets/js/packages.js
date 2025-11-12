@@ -1080,6 +1080,7 @@ $(document).ready(function() {
 				<td>${item.contact_name}</td>
 				<td>${item.user}</td>
 				<td>${item.message}</td>
+				<td>${item.t_cta}</td>
 				<td>${item.sid}</td>
 			</tr>`;
 			$('#tbl-sms-sent').append(row);

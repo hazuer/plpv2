@@ -20,6 +20,7 @@
                                 <th>Destinatario</th>
                                 <th>Envió</th>
                                 <th>Mensaje</th>
+                                <th>Cta.</th>
                                 <th>SID</th>
                             </tr>
                         </thead>

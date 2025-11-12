@@ -470,7 +470,11 @@ switch ($_POST['option']) {
 			cc.contact_name,
 			un.user,
 			n.message,
-			sid 
+			sid,
+			CASE 
+				WHEN message_id = '0' THEN 'Personal'
+				ELSE 'Meta Waba'
+			END AS t_cta 
 			FROM 
 				notification n 
 			INNER JOIN users un ON un.id = n.n_user_id 
@@ -1473,6 +1477,117 @@ async function sendMessageWhats(client, chatId, fullMessage, iconBot) {
 		$data['is_verified'] = $is_verified;
 		$result = $db->update('package',$data," `tracking` = '$tracking'");
 		echo json_encode($result);
+	break;
+
+	case 'deletePre':
+		$id_location     = $_POST['id_location'];
+		$rstDel = $db->sqlPure("DELETE FROM package_tmp WHERE id_location = " .$id_location);
+		$result = [
+			'success'  => 'true',
+			'dataJson' => $rstDel,
+			'message'  => 'Datos borrados'
+		];
+		echo json_encode($result);
+	break;
+
+	case 'createcbpre':
+		$id_location  = $_POST['id_location'];
+		$idParcel   = $_POST['idParcel'];
+		$parcelIn   = ($idParcel==99) ? " AND p.id_cat_parcel IN(1,2,3) ": "AND p.id_cat_parcel IN(".$idParcel.")";
+		$labelParcel = "";
+		switch ($idParcel) {
+			case 1:
+				$labelParcel = "jt";
+				break;
+			case 2:
+				$labelParcel = "imile";
+				break;
+			case 3:
+				$labelParcel = "cnmex";
+				break;
+			case 99:
+				$labelParcel = "todas";
+				break;
+		}
+		$typeLocation ='tlaqui';
+		if($id_location==2){$typeLocation='zaca';}
+
+		$result = [
+			'success'   => false,
+			'message'   => 'No se pudo abrir el archivo ZIP'
+		];
+
+		// Incluir la biblioteca PHPBarcode
+		require_once('../includes/barcode.php');
+
+		$sql ="SELECT 
+			p.tracking 
+		FROM 
+			package_tmp p 
+		WHERE 1 
+			AND p.id_location IN ($id_location) 
+			$parcelIn 
+		ORDER BY p.id_package DESC";
+		$codigos = $db->select($sql);
+
+		if(count($codigos)==0){
+			$result = [
+				'success'   => 'false',
+				'zip'       => '',
+				'message'   => 'Sin registros para crear códigos de barras'
+			];
+			echo json_encode($result);
+			return;
+		}
+
+		$archivos = array();
+		// Iterar sobre cada código y generar el código de barras correspondiente
+		$c=1;
+		foreach ($codigos as $data) {
+			$codigo = $data['tracking'];
+			// Nombre del archivo para guardar el código de barras
+			$nombreImagen = $c.'_'.$codigo . '.png';
+
+			// Llamar a la función barcode() para generar el código de barras con un tamaño más grande
+			barcode($nombreImagen, $codigo, 80, 'horizontal', 'code128', true, 1);
+
+			# aca agegar el nombreImagen al array archivos
+			array_push($archivos,$nombreImagen);
+			$c++;
+		}
+		$nameTypeMode = 'pre';
+		$nameOcurre= $nameTypeMode.'_'.$typeLocation.'_'.$labelParcel.'_T'.count($codigos).'_'.date('Y-m-d');
+		// Nombre del archivo ZIP
+		$zipFilename = $nameOcurre.'.zip';
+
+		// Crear una instancia de ZipArchive
+		$zip = new ZipArchive();
+
+		// Abrir el archivo ZIP para escritura
+		if ($zip->open($zipFilename, ZipArchive::CREATE) === TRUE) {
+			// Agregar cada archivo al archivo ZIP
+			foreach ($archivos as $archivo) {
+				// Crear un objeto SplFileInfo para el archivo
+				$fileInfo = new SplFileInfo($archivo);
+				// Agregar el archivo al ZIP usando el nombre base como nombre interno
+				$zip->addFile($archivo, $fileInfo->getBasename());
+			}
+			// Cerrar el archivo ZIP
+			$zip->close();
+
+			$result = [
+				'success'   => 'true',
+				'zip'       => $zipFilename,
+				'message'   => 'ok'
+			];
+		}
+
+		foreach ($archivos as $archivo) {
+			unlink($archivo);
+		}
+
+		echo json_encode($result);
+
 	break;
 }
 

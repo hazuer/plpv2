@@ -156,7 +156,7 @@ switch ($_POST['option']) {
 				$sqlLogger = "INSERT INTO logger 
 				(datelog, id_package, id_user, new_id_status, old_id_status, desc_mov) 
 				VALUES 
-				('$nDate', $id_package, $n_user_id, $newStatusPackage, $id_estatus, 'Envío de Mensaje WABA, ".$message_id."')";
+				('$nDate', $id_package, $n_user_id, $newStatusPackage, $id_estatus, 'Envío de Mensaje Meta, ".$message_id."')";
 				$db->sqlPure($sqlLogger, false);
 
 				$sqlUpdatePackage = "UPDATE package SET 

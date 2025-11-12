@@ -30,9 +30,12 @@
                 
             </div>
             <div class="modal-footer">
-                <button id="btn-send" type="button" class="btn btn-info" title="Enviar"><i class="fa fa-paper-plane"></i></button>
+                <button type="button" class="btn btn-info" title="Leer mensaje anterior"><i class="fa fa-chevron-circle-left"></i></button>
+                <button id="btn-send" type="button" class="btn btn-success" title="Enviar"><i class="fa fa-paper-plane"></i></button>
                 <button id="btn-read" type="button" class="btn btn-success" title="Leído"><i class="fa fa-check-circle"></i></button>
-                <button id="btn-close-chatw" type="button" class="btn btn-danger" title="Cerrar" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" title="Adjuntar"><i class="fa fa-paperclip"></i></button>
+                <button type="button" class="btn btn-info" title="Leer mensaje siguiente"><i class="fa fa-chevron-circle-right"></i></button>
+                <!-- <button id="btn-close-chatw" type="button" class="btn btn-danger" title="Cerrar" data-dismiss="modal">Cerrar</button> -->
             </div>
         </div>
     </div>

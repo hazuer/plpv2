@@ -23,22 +23,21 @@
 <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="96x96" href="assets/img/favicon/favicon-96x96.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon/favicon-16x16.png">
-<link rel="manifest" href="assets/img/favicon/manifest.json">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
 <meta name="theme-color" content="#ffffff">
 <!-- bootstrap css -->
 <link rel="stylesheet" href="css/bootstrap.min.css" />
 <!-- site css -->
-<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="style.css?version=<?php echo time();?>"/>
 <!-- responsive css -->
 <link rel="stylesheet" href="css/responsive.css" />
 <!-- color css -->
 <!--<link rel="stylesheet" href="css/colors.css" /> -->
 <!-- select bootstrap -->
-<link rel="stylesheet" href="css/bootstrap-select.css" />
+<!-- <link rel="stylesheet" href="css/bootstrap-select.css" /> -->
 <!-- scrollbar css -->
-<link rel="stylesheet" href="css/perfect-scrollbar.css" />
+<!-- <link rel="stylesheet" href="css/perfect-scrollbar.css" /> -->
 <!-- custom css -->
 <!-- <link rel="stylesheet" href="css/custom.css" />-->
 <!-- calendar file css -->

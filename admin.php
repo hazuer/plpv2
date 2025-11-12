@@ -176,7 +176,7 @@ require_once('includes/session.php');
 								<div class="card-footer bg-white border-0">
 									<div class="row">
 										<?php foreach ($packages as $package): ?>
-											<div class="col-6 col-sm-4 col-md-3 col-xxs-3 text-center mb-2" 
+											<div class="col-3 col-sm-4 col-md-3 col-xxs-3 text-center mb-2" 
 												data-toggle="tooltip" 
 												data-placement="top" 
 												title="<?php echo $package['tracking'];?>-<?php echo $package['receiver'];?>">

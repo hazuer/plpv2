@@ -37,11 +37,11 @@ $(document).ready(function() {
 			'excel'
 		],
 		"columns" : [
-			{title: `Telefono`,               name:`sender_phone`,       data:`sender_phone`},      //0
-			{title: `Contacto`,        name:`contact_name`,    data:`contact_name`},   //1
+			{title: `Teléfono`,               name:`sender_phone`,       data:`sender_phone`},      //0
+			{title: `Destinatario`,        name:`contact_name`,    data:`contact_name`},   //1
 			{title: `Último mensaje`,       name:`last_message`,      data:`last_message`},     //2
 			{title: `Fecha mensaje`,   name:`last_date`,   data:`last_date`},  //3
-            {title: `opc`,   name:`opc`,   data:`opc`},  //3
+            {title: `Opc.`,   name:`opc`,   data:`opc`},  //3
 		],
         "columnDefs": [
 			// { "width": "40%", "targets": [1,2] }
@@ -91,11 +91,15 @@ $(document).ready(function() {
                             hour: '2-digit',
                             minute: '2-digit'
                         });
+
+                        // 👇 Aquí transformamos el texto en HTML (imagen, audio, doc o texto plano)
+                        let content = renderMessageContent(msg.message_text);
+
                         html += `<div class="chat-bubble ${tipo}">
-                                    ${msg.message_text}
+                                    ${content}
                                     <span class="time">${fechaHora}</span>
                                 </div>`;
-                    });
+                    })
                 } else {
                     html = "<p style='text-align:center;color:#777;'>No hay mensajes.</p>";
                 }
@@ -111,6 +115,44 @@ $(document).ready(function() {
             }
         });
     }
+
+    function renderMessageContent(messageText) {
+        // Detectar si contiene el tag de guardado
+        if (messageText.startsWith("[IMAGE SAVED]")) {
+            let filePath = messageText.replace("[IMAGE SAVED]", "").trim();
+            //let fileName = filePath.split("/").pop();
+            return `
+                <a href="${base_url}/${filePath}" target="_blank">
+                    <img src="${base_url}/${filePath}" 
+                        class="chat-media" 
+                        style="max-width:200px; border-radius:8px; cursor:pointer;" />
+                </a>`;
+        }
+
+        if (messageText.startsWith("[AUDIO SAVED]")) {
+            let filePath = messageText.replace("[AUDIO SAVED]", "").trim();
+            return `<audio controls style="max-width:250px;">
+                        <source src="${base_url}/${filePath}" type="audio/ogg">
+                        Tu navegador no soporta audio.
+                    </audio>`;
+        }
+
+        if (messageText.startsWith("[DOCUMENT SAVED]")) {
+            let filePath = messageText.replace("[DOCUMENT SAVED]", "").trim();
+            let fileName = filePath.split("/").pop();
+            return `<a href="${base_url}/${filePath}" download="${fileName}" class="chat-doc">
+                        📄 ${fileName}
+                    </a>`;
+        }
+
+        if (messageText.startsWith("[REACTION]")) {
+            return `<span class="chat-reaction">${messageText}</span>`;
+        }
+
+    // Si no es multimedia, devolver como texto normal
+    return messageText;
+}
+
 
     $('#modal-chat-w').on('shown.bs.modal', function () {
     /*let chat = $('#chat-container');
@@ -164,7 +206,6 @@ $('#btn-send').on('click', function() {
 });
 
 function sendWhats(){
-    console.log('okas clic');
     let id_location = idLocationSelected.val();
     let tophone = $("#tophone").val();
     let tokenWaba = $("#tokenWaba").val();
@@ -188,8 +229,6 @@ function sendWhats(){
             success: function(response) {
                 console.log(response);
                 $("#chat-input").val('');
-                console.log('mensaje enviado');
-                // 👉 Refrescar mensajes inmediatamente después de enviar
                 cargarMensajes(tophone, phoneWaba);
             },
             error: function(xhr, status, error) {
@@ -217,7 +256,7 @@ $('#chat-input').on('keydown', function(e) {
 	});
 	async function loadModalTemplate() {
 		$('#mTIdLocation').val(idLocationSelected.val());
-		$('#modal-template-title').html('WhatsApp Business API');
+		$('#modal-template-title').html('Envío de mensajes meta');
 		$('#modal-template').modal({backdrop: 'static', keyboard: false}, 'show');
 		setTimeout(function(){
 			$('#mTTemplate').focus();
@@ -373,6 +412,9 @@ Te compartimos los datos de tu pedido: folios_db.
         });
 	}
 
+    $('#btn-cln').click(function(){
+        $('#chPhone').val('');
+    });
 
 });
 

@@ -65,7 +65,6 @@ $templateMsj = $user[0]['template'];
 		<script src="<?php echo BASE_URL;?>/assets/js/libraries/dataTables.buttons.min.js"></script>
 		<script src="<?php echo BASE_URL;?>/assets/js/libraries/jszip.min.js"></script>
 		<script src="<?php echo BASE_URL;?>/assets/js/libraries/pdfmake.min.js"></script>
-		<script src="<?php echo BASE_URL;?>/assets/js/libraries/vfs_fonts.js"></script>
 		<script src="<?php echo BASE_URL;?>/assets/js/libraries/buttons.html5.min.js"></script>
 		<link type="text/css" href="<?php echo BASE_URL;?>/assets/css/libraries/dataTables.checkboxes.css" rel="stylesheet"/>
 		<script type="text/javascript" src="<?php echo BASE_URL;?>/assets/js/libraries/dataTables.checkboxes.min.js"></script>
