@@ -638,21 +638,41 @@ console.log("  / __  / / / /  / /_/ / __ `/_  / / / / / _  \\/ ___/   / // __  \
 console.log(" / /_/ / /_/ /  / __  / /_/ / / /_/ /_/ /  __/ /     _/ // / / / /_/ / ");
 console.log("/_____/\\___, /  /_/ /_/\\___,_/ /___/\\___,_/\\____/_/     /___/_/ /_/\\___,  (.)");
 console.log("      /____/                                                  /____/   ");
-const qrcode = require("qrcode-terminal");
 const moment = require("moment-timezone");
-const { Client } = require("whatsapp-web.js");
+const { Client, Location, Poll, List, Buttons, LocalAuth } = require("./index");
 const Database = require("./database.js")
 const readline = require("readline");
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
-const client = new Client();
-client.on("qr", (qr) => {
-	qrcode.generate(qr, { small: true });
+const client = new Client({
+    authStrategy: new LocalAuth(),
+    puppeteer: { 
+        headless: false,
+    },
+});
+client.initialize();
+client.on("qr", async (qr) => {
+    // NOTE: This event will not be fired if a session is specified.
+    console.log("QR RECEIVED", qr);
+});
+client.on("code", (code) => {
+    console.log("Pairing code:",code);
+});
+client.on("authenticated", () => {
+    console.log("AUTHENTICATED");
+});
+client.on("auth_failure", msg => {
+    // Fired if session restore was unsuccessful
+    console.error("AUTHENTICATION FAILURE", msg);
 });
 client.on("ready", async () => {
-	console.log("Client is ready!");
+	console.log("READY");
+    const debugWWebVersion = await client.getWWebVersion();
+    console.log(`WWebVersion = ${debugWWebVersion}`);
+	////////////////////////////////////
+
 	let db = new Database("false")
 	const id_location = '.$id_location.';
 	const id_estatus = '.$idEstatus.';
@@ -790,10 +810,18 @@ client.on("ready", async () => {
 		console.log("Proceso de envío de mensajes cancelado");
 	  }
 	  rl.close();
+
 	});
 
+	////////////////////////////////////
+	client.pupPage.on("pageerror", function(err) {
+        console.log("Page error: " + err.toString());
+    });
+    client.pupPage.on("error", function(err) {
+        console.log("Page error: " + err.toString());
+    });
+
 });
-client.initialize();
 async function randomSleep(minMs, maxMs) {
     const ms = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
     console.log(`⏳ Esperando ${ms / 1000} segundos antes del siguiente mensaje...`);
