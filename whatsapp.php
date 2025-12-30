@@ -1,4 +1,6 @@
 <?php
+#error_reporting(E_ALL);
+#ini_set('display_errors', '1');
 session_start();
 define( '_VALID_MOS', 1 );
 
@@ -12,6 +14,13 @@ $id_location = $_SESSION['uLocation'];
 $sqlLocationInfo ="SELECT * FROM cat_location WHERE id_location IN($id_location)";
 $infoLocation = $db->select($sqlLocationInfo);
 $fechaDev = date("d/m/Y", strtotime("+2 days"));
+
+$hoy = date("d/m/Y");
+$tomorrow = date("d/m/Y", strtotime("+1 days"));
+
+$sqlTemplates ="SELECT id_template,name,id_cat_parcel FROM cat_template WHERE type_template IN(2) AND status IN (1)";
+$template = $db->select($sqlTemplates);
+
 ?>
 <!DOCTYPE html>
 <html lang="es-MX">
@@ -30,6 +39,12 @@ $fechaDev = date("d/m/Y", strtotime("+2 days"));
 
       <link rel="stylesheet" href="<?php echo BASE_URL;?>/assets/css/waba.css?version=<?php echo time(); ?>"/>
          <script src="<?php echo BASE_URL;?>/assets/js/whatsapp.js?version=<?php echo time(); ?>"></script>
+         <style>
+            .dynamic-field.dragover {
+    border: 2px dashed #5bc0de;
+    background: #f0fcff;
+}
+         </style>
       </head>
    <body class="dashboard dashboard_1"><body class="dashboard dashboard_1">
       <div class="full_container">
@@ -48,7 +63,7 @@ $fechaDev = date("d/m/Y", strtotime("+2 days"));
                     <div class="row column_title">
                         <div class="col-md-12">
                            <div class="page_title">
-                              <h2>Mensajes nuevos</h2>
+                              <h2>Chats</h2>
                            </div>
                         </div>
                      </div>
@@ -69,8 +84,8 @@ $fechaDev = date("d/m/Y", strtotime("+2 days"));
 
                                        <div class="col-md-2">
                                           <div class="form-group">
-                                             <label for="chPhone"><b>Télefono:</b></label>
-                                             <input type="text" class="form-control" name="chPhone" id="chPhone" value="<?php echo $chPhone; ?>" autocomplete="off">
+                                             <label for=""><b></b></label>
+                                             <input type="text" class="form-control" placeholder="Buscar chat por número" name="chPhone" id="chPhone" value="<?php echo $chPhone; ?>" autocomplete="off">
                                           </div>
                                        </div>
                                        <div class="col-md-1"><br>
@@ -154,11 +169,11 @@ $fechaDev = date("d/m/Y", strtotime("+2 days"));
                                                       <td>{$chat['sender_phone']}</td>
                                                       <td>{$contact_name}</td>
                                                       <td>{$lastMessage}</td>
-                                                      <td>{$last_date}</td>
+                                                      <td>{$last_date} ...</td>
                                                       <td style='text-align: center;'>
                                                          <div class='row'>
                                                             <div class='col-md-4'>
-                                                                  <span class='badge badge-pill badge-info' style='cursor: pointer;' id='btn-read-w' title='Leer'>
+                                                                  <span class='badge badge-pill badge-warning' style='cursor: pointer;' id='btn-read-w' title='Leer' data-phone='{$chat['sender_phone']}'>
                                                                      <i class='fa fa-whatsapp fa-lg' aria-hidden='true'></i>
                                                                   </span>
                                                             </div>
@@ -189,6 +204,7 @@ $fechaDev = date("d/m/Y", strtotime("+2 days"));
       <?php
 	  	   include('modal/chat-w.php');
          require_once('modal/waba-template.php');
+         require_once('modal/admin-template.php');
       	require_once('footer.php');
       ?>
    </body>

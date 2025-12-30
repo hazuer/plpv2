@@ -66,3 +66,28 @@
   margin-left: auto;
 }
 </style>
+
+<script>
+$(document).ready(function () {
+
+    // 📸 Arreglo de imágenes disponibles
+    const images = [
+        'grinch.gif',
+        'navidad.gif',
+        'regalo.gif',
+        'reno.gif',
+        'santa.gif',
+        'mnieve.gif',
+        'esfera.gif'
+    ];
+
+  const randomImage = images[Math.floor(Math.random() * images.length)];
+  const cacheBuster = new Date().getTime();
+
+  $('#profileImg').attr(
+      'src',
+      'gif/' + randomImage + '?v=' + cacheBuster
+  );
+
+});
+</script>

@@ -131,7 +131,7 @@ foreach ($chats as $chat) {
             <td style='text-align: center;'>
                 <div class='row'>
                     <div class='col-md-4'>
-                        <span class='badge badge-pill badge-info' style='cursor: pointer;' id='btn-read-w' title='Leer'>
+                        <span class='badge badge-pill badge-info' style='cursor: pointer;' id='btn-read-w' title='Leer' data-phone='{$chat['sender_phone']}'>
                             <i class='fa fa-whatsapp fa-lg' aria-hidden='true'></i>
                         </span>
                     </div>
@@ -173,7 +173,7 @@ foreach ($chats as $chat) {
                 <td style='text-align: center;'>
                     <div class='row'>
                         <div class='col-md-4'>
-                            <span class='badge badge-pill badge-info' style='cursor: pointer;' id='btn-read-w' title='Leer'>
+                            <span class='badge badge-pill badge-danger' style='cursor: pointer;' id='btn-read-w' title='Leer' data-phone='{$chat['sender_phone']}'>
                                 <i class='fa fa-whatsapp fa-lg' aria-hidden='true'></i>
                             </span>
                         </div>

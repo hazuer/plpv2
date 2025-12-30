@@ -7,70 +7,76 @@ require_once('includes/DB.php');
 $db = new DB(HOST,USERNAME,PASSWD,DBNAME,PORT,SOCKET);
 require_once('includes/session.php');
 
-			$id_location = $_SESSION['uLocation'];
-			$sql = "SELECT 
-				p.id_package,
-				p.tracking,
-				p.is_verified,
-				p.folio,
-				cc.contact_name receiver,
-				UPPER(SUBSTRING(TRIM(REPLACE(
+$id_location = $_SESSION['uLocation'];
+$sql = "SELECT 
+	p.id_package,
+	p.tracking,
+	p.is_verified,
+	p.folio,
+	cc.contact_name receiver,
+	UPPER(SUBSTRING(TRIM(REPLACE(
+		REPLACE(
+			REPLACE(
+				REPLACE(
 					REPLACE(
 						REPLACE(
 							REPLACE(
-								REPLACE(
-									REPLACE(
-										REPLACE(
-											REPLACE(cc.contact_name, 'á', 'a'),
-										'é', 'e'),
-									'í', 'i'),
-								'ó', 'o'),
-							'ú', 'u'),
-						'Á', 'A'),
-					'Ñ', 'N'),
-				'É', 'E')), 1, 1)) AS initial,
-				p.marker 
-				FROM package p 
-				INNER JOIN cat_contact cc ON cc.id_contact = p.id_contact 
-				WHERE p.id_location IN ($id_location) 
-				AND p.id_status IN (1, 2, 5, 6, 7, 8) 
-				ORDER BY initial, p.folio
-			";
+								REPLACE(cc.contact_name, 'á', 'a'),
+							'é', 'e'),
+						'í', 'i'),
+					'ó', 'o'),
+				'ú', 'u'),
+			'Á', 'A'),
+		'Ñ', 'N'),
+	'É', 'E')), 1, 1)) AS initial,
+	p.marker 
+	FROM package p 
+	INNER JOIN cat_contact cc ON cc.id_contact = p.id_contact 
+	WHERE p.id_location IN ($id_location) 
+	AND p.id_status IN (1, 2, 5, 6, 7, 8) 
+	ORDER BY initial, p.folio
+";
 
-			$result = $db->select($sql);
-			$groupedPackages = [];
-			// Contadores
-			$countJMX1   = 0;
-			$countCN1    = 0;
-			$countImile1 = 0;
+$result = $db->select($sql);
+$groupedPackages = [];
+// Contadores
+$countJMX1   = 0;
+$countCN1    = 0;
+$countImile1 = 0;
 
-			foreach($result as $row){
-				$initial = $row['initial'];  // La primera letra del nombre
-				$folio   = $row['folio'];      // El folio del paquete
+foreach($result as $row){
+	$initial = $row['initial'];  // La primera letra del nombre
+	$folio   = $row['folio'];      // El folio del paquete
 
-				// Recorrer el array y contar los que comienzan con "JMX"
-				if (strpos($row['tracking'], 'JMX') === 0) {
-					$countJMX1++;
-				}else if(strpos($row['tracking'], 'CNMEX') === 0) {
-					$countCN1++;
-				} else {
-					$countImile1++;
-				}
-				// Agrupar los paquetes por inicial
-				if (!isset($groupedPackages[$initial])) {
-					$groupedPackages[$initial] = [];
-				}
+	// Recorrer el array y contar los que comienzan con "JMX"
+	if (strpos($row['tracking'], 'JMX') === 0) {
+		$countJMX1++;
+	}else if(strpos($row['tracking'], 'CNMEX') === 0) {
+		$countCN1++;
+	} else {
+		$countImile1++;
+	}
+	// Agrupar los paquetes por inicial
+	if (!isset($groupedPackages[$initial])) {
+		$groupedPackages[$initial] = [];
+	}
 
-				// Dentro de cada inicial, agrupar por folio
-				$groupedPackages[$initial][] = [
-					'tracking' => $row['tracking'],
-					'folio'    => $folio,
-					'receiver' => $row['receiver'],
-					'marker'   => $row['marker'],
-					'is_verified'   => $row['is_verified']
-				];
-			}
-			?>
+	// Dentro de cada inicial, agrupar por folio
+	$groupedPackages[$initial][] = [
+		'tracking' => $row['tracking'],
+		'folio'    => $folio,
+		'receiver' => $row['receiver'],
+		'marker'   => $row['marker'],
+		'is_verified'   => $row['is_verified']
+	];
+}
+
+$sqlStatus = "SELECT enable_bot FROM cat_location where id_location IN ($id_location)";
+$resultStatus = $db->select($sqlStatus);
+$enable_bot = $resultStatus[0]['enable_bot'] ?? 0;
+$text_enable_bot = ($enable_bot==1) ? "Desactivar Bot":"Activar Bot";		
+
+?>
 <!DOCTYPE html>
 <html lang="es-MX">
 	<head>

@@ -127,7 +127,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sqlLocationInfo = "SELECT * FROM cat_location WHERE phone_waba = '".$wabaPhone."'";
         $infoLocation    = $db->select($sqlLocationInfo);
         $token           = $infoLocation[0]['token'];
-        $enableBot       = $infoLocation[0]['enable_bot'];
         if (empty($infoLocation)) {
             logger("ERROR: cat_location no encontrado para: ".$wabaPhone);
             exit;
@@ -153,38 +152,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 logger("body: ".$body);
                 break;
 
-                case 'image':
-                    $media_id = $message['image']['id'];
-                    $mime_type = $message['image']['mime_type'] ?? 'image/jpeg';
-                    
-                    // Determinar extensión según mime_type
-                    $ext = 'jpg';
-                    if (strpos($mime_type, 'png') !== false) $ext = 'png';
-                    elseif (strpos($mime_type, 'jpeg') !== false || strpos($mime_type, 'jpg') !== false) $ext = 'jpg';
-                    elseif (strpos($mime_type, 'webp') !== false) $ext = 'webp';
-                    
-                    $filename = $media_id.".".$ext;
-                    
-                    $mediaInfo = getMediaUrl($media_id, $token);
-                    if (isset($mediaInfo['url'])) {
-                            $savePath = "meta/image/".$filename;
-                            downloadMedia($mediaInfo['url'], $token, $savePath);
-                            $body = "[IMAGE SAVED] $savePath";
-                            
-                            // Enviar mensaje de confirmación de paquetes
-                            $texto = "✅ *Confirmación recibida*\n\n";
-                            $texto .= "*iMile:*\n";
-                            $texto .= "✔️ Su identificación ha sido recibida.\n";
-                            $texto .= "⏱️ Tiene *2 días* para recoger su paquete.\n\n";
-                            $texto .= "*J&T:*\n";
-                            $texto .= "✔️ Su paquete está listo.\n";
-                            $texto .= "⏱️ Tiene hasta *3 días* para recogerlo.\n\n";
-                            $texto .= "📍 Recuerde traer una identificación oficial al momento de recoger su paquete.";
-                            insertCallbackMessage($db, $from, $message_id, $body, $raw_json);
-                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone,$enableBot);
-                        }
-                
-                    break;
+            case 'image':
+                $media_id = $message['image']['id'];
+                $mediaInfo = getMediaUrl($media_id, $token);
+                if (isset($mediaInfo['url'])) {
+                    $savePath = "meta/image/".$media_id.".jpg";
+                    downloadMedia($mediaInfo['url'], $token, $savePath);
+                    $body = "[IMAGE SAVED] $savePath";
+                } else {
+                    $body = "[IMAGE] ID: ".$media_id;
+                }
+                insertCallbackMessage($db, $from, $message_id, $body, $raw_json);
+                break;
 
             case 'audio':
                 $media_id = $message['audio']['id'];
@@ -193,8 +172,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $savePath = "meta/audio/".$media_id.".ogg";
                     downloadMedia($mediaInfo['url'], $token, $savePath);
                     $body = "[AUDIO SAVED] $savePath";
-                    insertCallbackMessage($db, $from, $message_id, $body, $raw_json);
                 }
+                insertCallbackMessage($db, $from, $message_id, $body, $raw_json);
                 break;
 
             case 'document':
@@ -205,8 +184,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $savePath = "meta/document/".$filename;
                     downloadMedia($mediaInfo['url'], $token, $savePath);
                     $body = "[DOCUMENT SAVED] $savePath";
-                    insertCallbackMessage($db, $from, $message_id, $body, $raw_json);
                 }
+                insertCallbackMessage($db, $from, $message_id, $body, $raw_json);
                 break;
 
             case 'reaction':
@@ -233,13 +212,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if ($buttonId === "btn_horario") {
                             $horarioJson = $infoLocation[0]['schedule'] ?? '';
                             $respuestaHorario = getHorarioHoy($horarioJson);
-                            sendText($from, $token, $phoneNumberId, "Nuestro horario de atención es:\n".$respuestaHorario."\nPuedes acudir por tu paquete en cualquier momento dentro de ese horario.", $wabaPhone,$enableBot);
+                            sendText($from, $token, $phoneNumberId, "Nuestro horario de atención es:\n*".$respuestaHorario."*\nPuedes acudir por tu paquete en cualquier momento dentro de ese horario.", $wabaPhone);
                         }
 
                         if ($buttonId === "btn_ubicacion") {
                             $texto = "Nos encuentras en:\n*".($infoLocation[0]['address'] ?? '')."*\n\nPara ver cómo llegar, solo haz clic aquí:\n" . ($infoLocation[0]['address_share'] ?? '');
 
-                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone,$enableBot);
+                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone);
                         }
 
                         if ($buttonId === "btn_paquete") {
@@ -266,11 +245,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 foreach ($rst as $row) {
                                     $texto .= "- ".$row['parcel']."\n*".$row['tracking']."*\n\n";
                                 }
-                                $texto .= "Tus paquetes están listos para ser recogidos en nuestra sucursal en el horario de atención. ".$respuestaHorario."\n\n¡Te esperamos pronto!";
-                                sendText($from, $token, $phoneNumberId, $texto, $wabaPhone,$enableBot);
+                                $texto .= "Tus paquetes están listos para ser recogidos en nuestra sucursal en el horario de atención. *".$respuestaHorario."*\n\n¡Te esperamos pronto!";
+                                sendText($from, $token, $phoneNumberId, $texto, $wabaPhone);
                             }else{
                                 $texto = "No tenemos noticias sobre tu(s) paquete(s) en este momento. \nSi crees que es un error, por favor contáctanos directamente.";
-                                sendText($from, $token, $phoneNumberId, $texto, $wabaPhone,$enableBot);
+                                sendText($from, $token, $phoneNumberId, $texto, $wabaPhone);
                                 // Desactivar el bot
                                 enableDisableBot($from,0);
                                 return;
@@ -279,12 +258,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         if ($buttonId === "btn_delivery_q") {
                             $texto = "Desde hace más de dos años operamos únicamente con el método *Ocurre*, por eso le enviamos la ubicación y la dirección para que pueda pasar a recoger su paquete.";
-                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone,$enableBot);
+                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone);
                         }
 
                         if ($buttonId === "btn_envios") {
                             $texto = "Sí, realizamos envíos a cualquier parte de la República Mexicana y también a los Estados Unidos.\nPara brindarte el costo exacto, por favor compártenos el *Código Postal* y el destino.";
-                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone,$enableBot);
+                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone);
                             // Desactivar el bot
                             enableDisableBot($from,0);
                             return;
@@ -293,58 +272,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if ($buttonId === "btn_no_puedo_ir") {
                             $horarioJson = $infoLocation[0]['schedule'] ?? '';
                             $respuestaHorario = getHorarioHoy($horarioJson);
-                            $texto = "Si usted no puede pasar por su paquete, puede enviar a alguien con una *identificación* para recogerlo dentro del horario de atención.\n".$respuestaHorario."";
-                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone,$enableBot);
+                            $texto = "Si usted no puede pasar por su paquete, puede enviar a alguien con una *identificación* para recogerlo dentro del horario de atención.\n*".$respuestaHorario."*";
+                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone);
                         }
 
                         if ($buttonId === "btn_devolucion") {
                             $texto = "Las devoluciones se gestionan directamente en la plataforma donde realizó su compra.\nDesde ahí podrá iniciar el proceso correspondiente.";
-                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone,$enableBot);
+                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone);
                         }
 
                         if ($buttonId === "btn_confirmar") {
-                            $texto = "📦 *Confirmación y recolección de paquetes*\n\n";
-                            $texto .= "*iMile:*\n";
-                            $texto .= "✔️ Es necesario enviar su *identificación* para confirmar el paquete.\n";
-                            $texto .= "⏱️ Una vez enviada, tiene *2 días* para recogerlo.\n\n";
-                            $texto .= "*J&T:*\n";
-                            $texto .= "✔️ *No requiere identificación* para confirmar el paquete.\n";
-                            $texto .= "⏱️ Tiene hasta *3 días* para recogerlo.\n\n";
-                            $texto .= "¿Desea confirmar su paquete?";
-                            
-                            sendInteractiveButtons($from, $token, $phoneNumberId, $wabaPhone, $texto, [
-                                ["id" => "btn_confirmar_si", "title" => "✅ Sí, confirmar"],
-                                ["id" => "btn_confirmar_no", "title" => "❌ No, gracias"]
-                            ],$enableBot);
-                            enableDisableBot($from,0);
-                            return;
+                            $texto = "📦 Confirmación y recolección de paquetes\n*iMile:*\n✔️ Es necesario enviar su *identificación* para confirmar el paquete.\n⏱️ Una vez enviada, tiene *2 días* para recogerlo.\n\n*J&T:*\n✔️ *No requiere identificación* para confirmar el paquete.\n⏱️ Tiene hasta *3 días* para recogerlo.";
+                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone);
                         }
 
                         if ($buttonId === "btn_no") {
                             $texto = "Perfecto 😊. Me alegra haber ayudado. Si necesitas algo más, aquí estaré.";
-                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone,$enableBot);
+                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone);
                             // Desactivar el bot
                             enableDisableBot($from,0);
                             return; // Detener flujo
                         }
-
-                        if ($buttonId === "btn_confirmar_si") {
-                            $texto = "📄 Para completar el proceso, por favor adjunta una foto de tu identificación oficial.";
-                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone,$enableBot);
-                            // Desactivar el bot después de confirmar
-                            enableDisableBot($from, 0);
-                            return;
-                        }
-
-                        if ($buttonId === "btn_confirmar_no") {
-                            $texto = "Entendido. Si cambia de opinión o necesita algo más, aquí estaré para ayudarle 😊";
-                            sendText($from, $token, $phoneNumberId, $texto, $wabaPhone,$enableBot);
-                            // Desactivar el bot
-                            enableDisableBot($from, 0);
-                            return;
-                        }
-
-                        #TODO: btn_confirmar_no
                     }
                 break;
             default:
@@ -357,12 +305,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 🔒 CONTROL DE PAUSA Y REACTIVACIÓN DEL BOT
         // ==========================================
 
+        // Obtener estado del bot
        if ($type === 'text') {
-
-        if ($enableBot == 0) {
-            logger("Bot deshabilitado desde cat_location.");
-            return;
-        }
         // Obtener estado del bot
             $sql = "SELECT bot_active FROM waba_user_buttons WHERE phone = '$from' LIMIT 1";
             $res = $db->select($sql);
@@ -376,7 +320,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (in_array($bodyClean, $reactivar)) {
                     // Reactivar bot
                     enableDisableBot($from,1);
-                    sendText($from, $token, $phoneNumberId,"¿Hay algo más en lo que podamos ayudarte?",$wabaPhone);
+                    sendText($from, $token, $phoneNumberId,"¿Hay algo más en lo que podamos ayudarte?:",$wabaPhone);
+                    //TODO:sendBotMenu($from, $token, $phoneNumberId, $wabaPhone);
                 }
                 // No bloquear el flujo si el mensaje no coincide
                 return;
@@ -398,7 +343,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($graciasPatterns as $pattern) {
                 if (strpos($bodyClean, $pattern) !== false) {
                     sendText($from,$token,$phoneNumberId,"Estamos para servirle 😊",$wabaPhone);
-                    sendBotMenu($from, $token, $phoneNumberId, $wabaPhone, $body,$enableBot);
                     // Desactivar el bot
                     //TODO: enableDisableBot($from, 0);
                     return;
@@ -409,7 +353,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // ======================================
         // 🟢 BOT ACTIVO → ENVIAR MENÚ NORMALMENTE
         // ======================================
-        sendBotMenu($from, $token, $phoneNumberId, $wabaPhone,$body,$enableBot);
+        sendBotMenu($from, $token, $phoneNumberId, $wabaPhone,$body);
         // ======================================
 
         exit;
@@ -451,76 +395,31 @@ function getHorarioHoy($jsonHorario) {
     $dias = [
         "Monday"    => "lunes",
         "Tuesday"   => "martes",
-        "Wednesday" => "miércoles",
+        "Wednesday" => "miercoles",
         "Thursday"  => "jueves",
         "Friday"    => "viernes",
-        "Saturday"  => "sábado",
+        "Saturday"  => "sabado",
         "Sunday"    => "domingo"
     ];
 
-    // === HOY ===
     $hoy_en = date("l");            // Ej: "Friday"
     $hoy_es = $dias[$hoy_en];       // Ej: "viernes"
-    
-    // Normalizar clave de hoy (sin tildes)
-    $hoy_key = str_replace(
-        ['á', 'é', 'í', 'ó', 'ú'],
-        ['a', 'e', 'i', 'o', 'u'],
-        strtolower($hoy_es)
-    );
 
-    // Buscar horario de hoy
-    $horario_hoy = null;
-    if (isset($horarios[$hoy_key])) {
-        $horario_hoy = $horarios[$hoy_key];
-    } elseif (isset($horarios[strtolower($hoy_es)])) {
-        $horario_hoy = $horarios[strtolower($hoy_es)];
+    // Obtener horario de hoy
+    if (!isset($horarios[$hoy_es])) {
+        return "Hoy $hoy_es no tenemos horario registrado.";
     }
 
-    $texto_hoy = "*Hoy $hoy_es: ";
-    if ($horario_hoy) {
-        $texto_hoy .= "de {$horario_hoy['open']} hrs. a {$horario_hoy['close']} hrs.*";
-    } else {
-        $texto_hoy .= "no tenemos horario registrado";
-    }
+    $open  = $horarios[$hoy_es]['open'];
+    $close = $horarios[$hoy_es]['close'];
 
-    // === MAÑANA ===
-    $manana_en = date("l", strtotime("+1 day"));  // Ej: "Saturday"
-    $manana_es = $dias[$manana_en];               // Ej: "sábado"
-    
-    // Normalizar clave de mañana (sin tildes)
-    $manana_key = str_replace(
-        ['á', 'é', 'í', 'ó', 'ú'],
-        ['a', 'e', 'i', 'o', 'u'],
-        strtolower($manana_es)
-    );
-
-    // Buscar horario de mañana
-    $horario_manana = null;
-    if (isset($horarios[$manana_key])) {
-        $horario_manana = $horarios[$manana_key];
-    } elseif (isset($horarios[strtolower($manana_es)])) {
-        $horario_manana = $horarios[strtolower($manana_es)];
-    }
-
-    $texto_manana = "\n*Mañana $manana_es: ";
-    if ($horario_manana) {
-        $texto_manana .= "de {$horario_manana['open']} hrs. a {$horario_manana['close']} hrs.*";
-    } else {
-        $texto_manana .= "cerrado";
-    }
-
-    return $texto_hoy . $texto_manana;
+    return "Hoy $hoy_es de $open a $close";
 }
 
-function sendText($to, $token, $phoneNumberId, $text, $wabaPhone,$enableBot=1) {
+function sendText($to, $token, $phoneNumberId, $text, $wabaPhone){
     global $db;
-    if ($enableBot == 0) {
-        logger("Bot deshabilitado desde cat_location.");
-        return;
-    }
     usleep(200000);
-    $url = "https://graph.facebook.com/v23.0/$phoneNumberId/messages";
+    $url = "https://graph.facebook.com/v21.0/$phoneNumberId/messages";
 
     $payload = [
         "messaging_product" => "whatsapp",
@@ -554,125 +453,139 @@ function sendText($to, $token, $phoneNumberId, $text, $wabaPhone,$enableBot=1) {
     }
 }
 
-function sendBotMenu($from, $token, $phoneNumberId, $wabaPhone, $body = '',$enableBot=1) {
+function sendBotMenu($from, $token, $phoneNumberId, $wabaPhone, $body = ''){
     global $db;
-    usleep(200000);
-    if ($enableBot == 0) {
-        logger("Bot deshabilitado desde cat_location.");
-        return;
-    }
     $bodyClean = normalizeText($body);
-    
-    $keywordMap = [
-        // 1️⃣ Horario
-        "btn_horario" => [
-            "horario",
-            "hora de",
-            "abren",
-            "cierran",
-            "a que hora",
-            "hasta que hora",
-            "abierto",
-            "siguen abiertos",
-            "ya cerraron",
-            "alcanzo",
-            "alcanzo a recogerlo",
-            "mañana"
-        ],
-        // 2️⃣ Ubicación
-        "btn_ubicacion" => [
-            "ubicacion", "ubicación",
-            "donde estan", "dónde están",
-            "donde se encuentran",
-            "donde se ubican",
-            "direccion", "dirección",
-            "como llegar", "cómo llegar",
-            "mapa",
-            "ubicados"
-        ],
-        // 3️⃣ Paquete / Tracking
-        "btn_paquete" => [
-            "paquete",
-            "mi paquete",
-            "llego mi paquete",
-            "llegó mi paquete",
-            "pedido",
-            "tracking",
-            "rastreo",
-            "seguimiento"
-        ],
-        // 4️⃣ Entrega a domicilio
-        "btn_delivery_q" => [
-            "entregan a domicilio",
-            "envio a domicilio",
-            "me lo llevan",
-            "me lo entregan",
-            "no me ha llegado",
-            "no llego a casa"
-        ],
-        // 5️⃣ Envíos
-        "btn_envios" => [
-            "envian",
-            "envios", "envíos",
-            "quiero enviar",
-            "mandar un paquete",
-            "cotizar envio",
-            "costo de envio",
-            "costo de un envio",
-            "precio de envio",
-            "estados unidos",
-            "republica mexicana",
-        ],
-        // 6️⃣ No puedo ir personalmente
-        "btn_no_puedo_ir" => [
-            "no puedo ir",
-            "puede ir otra persona",
-            "alguien mas puede ir",
-            "otra persona puede recoger",
-            "puede recoger alguien mas",
-            "mandar a alguien",
-            "recogerlo",
-            "alguien mas",
-            "alguien"
-        ],
-        // 7️⃣ Devolución
-        "btn_devolucion" => [
-            "devolucion", "devolución",
-            "quiero devolver",
-            "quiero regresar",
-            "devolver pedido",
-            "regresar pedido",
-            "reembolso",
-            "cancelar pedido",
-            "no lo quiero",
-            "no me sirve",
-            "vino roto",
-            "vino dañado",
-            "vino mal"
-        ],
-        // 8️⃣ Confirmar paquete / identificación
-        "btn_confirmar" => [
-            "confirmar",
-            "confirmar mi paquete",
-            "ya envie mi identificacion",
-            "ya mande mi identificacion",
-            "ya envie mi ine",
-            "mande mi ine",
-            "envie mi id",
-            "te mande mi id",
-            "credencial",
-            "ine"
-        ]
-    ];
-    
+$keywordMap = [
+
+    // 1️⃣ Horario
+    "btn_horario" => [
+        "horario",
+        "hora de",
+        "abren",
+        "cierran",
+        "a que hora",
+        "hasta que hora",
+        "abierto",
+        "siguen abiertos",
+        "ya cerraron"
+    ],
+
+    // 2️⃣ Ubicación
+    "btn_ubicacion" => [
+        "ubicacion", "ubicación",
+        "donde estan", "dónde están",
+        "donde se encuentran",
+        "donde se ubican",
+        "direccion", "dirección",
+        "como llegar", "cómo llegar",
+        "mapa",
+        "ubicados"
+    ],
+
+    // 3️⃣ Paquete / Tracking
+    "btn_paquete" => [
+        "paquete",
+        "mi paquete",
+        "llego mi paquete",
+        "llegó mi paquete",
+        "pedido",
+        "tracking",
+        "rastreo",
+        "seguimiento"
+    ],
+
+    // 4️⃣ Entrega a domicilio
+    "btn_delivery_q" => [
+        "entregan a domicilio",
+        "envio a domicilio",
+        "me lo llevan",
+        "me lo entregan",
+        "no me ha llegado",
+        "no llego a casa"
+    ],
+
+    // 5️⃣ Envíos
+    "btn_envios" => [
+        "envian",
+        "envios", "envíos",
+        "quiero enviar",
+        "mandar un paquete",
+        "cotizar envio",
+        "costo de envio",
+        "precio de envio",
+        "estados unidos",
+        "republica mexicana",
+    ],
+
+    // 6️⃣ No puedo ir personalmente
+    "btn_no_puedo_ir" => [
+        "no puedo ir",
+        "puede ir otra persona",
+        "alguien mas puede ir",
+        "otra persona puede recoger",
+        "puede recoger alguien mas",
+        "mandar a alguien"
+    ],
+
+    // 7️⃣ Devolución
+    "btn_devolucion" => [
+        "devolucion", "devolución",
+        "quiero devolver",
+        "quiero regresar",
+        "devolver pedido",
+        "regresar pedido",
+        "reembolso",
+        "cancelar pedido",
+        "no lo quiero",
+        "no me sirve",
+        "vino roto",
+        "vino dañado",
+        "vino mal"
+    ],
+
+    // 8️⃣ Confirmar paquete / identificación
+    "btn_confirmar" => [
+        "confirmar",
+        "confirmar mi paquete",
+        "ya envie mi identificacion",
+        "ya mande mi identificacion",
+        "ya envie mi ine",
+        "mande mi ine",
+        "envie mi id",
+        "te mande mi id",
+        "credencial",
+        "ine"
+    ],
+
+    // 9️⃣ Cierre / cortesía
+    "btn_no" => [
+        "gracias",
+        "muchas gracias",
+        "ok gracias",
+        "todo bien",
+        "por ahora no",
+        "nada mas gracias"
+    ]
+];
+
+    $priorityButtonId = null;
+    foreach ($keywordMap as $buttonId => $keywords) {
+        foreach ($keywords as $word) {
+            if (strpos($bodyClean, $word) !== false) {
+                $priorityButtonId = $buttonId;
+                break 2; // salir de ambos foreach
+            }
+        }
+    }
+
     $noTexts = [
         "Todo bien, gracias 😊",
         "Gracias, eso es todo",
         "Nada más, gracias",
         "No, gracias"
     ];
-    
-    // Lista total de botones
+    // 1. Lista total
     $allButtons = [
         ["id"=>"btn_horario",  "title"=>"🕔 Horario"],
         ["id"=>"btn_ubicacion","title"=>"📍 Ubicación"],
@@ -684,89 +597,41 @@ function sendBotMenu($from, $token, $phoneNumberId, $wabaPhone, $body = '',$enab
         ["id"=>"btn_confirmar",   "title"=>"📦 Confirmar"],
         ["id"=>"btn_no",  "title"=>$noTexts[array_rand($noTexts)]]
     ];
-    
-    // Buscar TODAS las coincidencias con puntuación
-    $matchedButtons = [];
-    
-    foreach ($keywordMap as $buttonId => $keywords) {
-        $score = 0;
-        $matchedKeywords = [];
-        
-        foreach ($keywords as $word) {
-            if (strpos($bodyClean, $word) !== false) {
-                $score++;
-                $matchedKeywords[] = $word;
-            }
-        }
-        
-        if ($score > 0) {
-            $matchedButtons[] = [
-                'button_id' => $buttonId,
-                'score' => $score,
-                'keywords' => $matchedKeywords
-            ];
+
+    // 2. Obtener botones usados
+    $sql = "SELECT button_id FROM waba_user_buttons WHERE phone = '$from'";
+    $used = $db->select($sql);
+    $usedButtons = array_column($used, "button_id");
+    $remaining = [];
+
+    if ($priorityButtonId) {
+    foreach ($allButtons as $k => $btn) {
+        if ($btn['id'] === $priorityButtonId) {
+            $priorityBtn = $btn;
+            unset($allButtons[$k]);
+            array_unshift($allButtons, $priorityBtn);
+            break;
         }
     }
-    
-    // Ordenar por puntuación (mayor a menor)
-    usort($matchedButtons, function($a, $b) {
-        return $b['score'] - $a['score'];
-    });
-    
-    // Si NO hay coincidencias, enviar solo btn_no
-    if (empty($matchedButtons)) {
-        $nextButtons = [
-            ["id"=>"btn_no", "title"=>$noTexts[array_rand($noTexts)]]
-        ];
-    } else {
-        // Si HAY coincidencias, obtener botones usados
-        $sql = "SELECT button_id FROM waba_user_buttons WHERE phone = '$from'";
-        $used = $db->select($sql);
-        $usedButtons = array_column($used, "button_id");
-        
-        // Crear array de botones priorizados basados en coincidencias
-        $prioritizedButtons = [];
-        
-        // Primero agregar los botones con coincidencias (en orden de puntuación)
-        foreach ($matchedButtons as $match) {
-            $buttonId = $match['button_id'];
-            
-            // Buscar el botón en allButtons
-            foreach ($allButtons as $btn) {
-                if ($btn['id'] === $buttonId && !in_array($buttonId, $usedButtons)) {
-                    $prioritizedButtons[] = $btn;
-                    break;
-                }
-            }
+}
+    // 3. Filtrar botones que faltan
+    foreach ($allButtons as $btn) {
+        if (!in_array($btn["id"], $usedButtons)) {
+            $remaining[] = $btn;
         }
-        
-        // Luego agregar otros botones no usados
-        foreach ($allButtons as $btn) {
-            if (!in_array($btn["id"], $usedButtons)) {
-                $alreadyAdded = false;
-                foreach ($prioritizedButtons as $pb) {
-                    if ($pb['id'] === $btn['id']) {
-                        $alreadyAdded = true;
-                        break;
-                    }
-                }
-                if (!$alreadyAdded) {
-                    $prioritizedButtons[] = $btn;
-                }
-            }
-        }
-        
-        // Si ya no quedan botones sin usar, reiniciar
-        if (empty($prioritizedButtons)) {
-            $prioritizedButtons = $allButtons;
-            $sql = "DELETE FROM waba_user_buttons WHERE phone = '$from'";
-            $db->sqlPure($sql, false);
-        }
-        
-        // Tomar máximo 3 botones
-        $nextButtons = array_slice($prioritizedButtons, 0, 3);
     }
-    
+
+    // 4. Tomar máximo 3
+    $nextButtons = array_slice($remaining, 0, 3);
+
+    // 5. Si ya no hay botones → reiniciar
+    if (empty($nextButtons)) {
+        $nextButtons = array_slice($allButtons, 0, 3);
+        // Borramos historial para reiniciar el ciclo
+        $sql = "DELETE FROM waba_user_buttons WHERE phone = '$from'";
+        $db->sqlPure($sql, false);
+    }
+
     // ====== Construir el payload ======
     $mensajesPosibles = [
         "¿Qué más necesitas?",
@@ -776,8 +641,8 @@ function sendBotMenu($from, $token, $phoneNumberId, $wabaPhone, $body = '',$enab
         "¿Desea otra opción?"
     ];
     $mensaje = $mensajesPosibles[array_rand($mensajesPosibles)];
-    
     $buttons = [];
+
     foreach ($nextButtons as $b) {
         $buttons[] = [
             "type" => "reply",
@@ -787,7 +652,7 @@ function sendBotMenu($from, $token, $phoneNumberId, $wabaPhone, $body = '',$enab
             ]
         ];
     }
-    
+
     $payload = [
         "messaging_product" => "whatsapp",
         "to" => $from,
@@ -802,9 +667,9 @@ function sendBotMenu($from, $token, $phoneNumberId, $wabaPhone, $body = '',$enab
             ]
         ]
     ];
-    
+
     // ====== Enviar petición ======
-    $url = "https://graph.facebook.com/v23.0/$phoneNumberId/messages";
+    $url = "https://graph.facebook.com/v21.0/$phoneNumberId/messages";
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "Authorization: Bearer $token",
@@ -815,95 +680,27 @@ function sendBotMenu($from, $token, $phoneNumberId, $wabaPhone, $body = '',$enab
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec($ch);
     curl_close($ch);
-    
+
     logger("Menu enviado: ".$response);
-    
+
     // ====== Combinar texto y títulos ======
     $button_titles = array_map(function($b){ 
         return $b['reply']['title']; 
     }, $buttons);
     $concatenado = $mensaje . " | " . implode(" | ", $button_titles);
-    
     // ====== Guardar en BD ======
     $decoded = json_decode($response, true);
     if (isset($decoded['messages'][0]['id'])) {
+
         $message_id = $decoded['messages'][0]['id'];
         $date = date("Y-m-d H:i:s");
+
         $sql = "INSERT INTO waba_callbacks 
         (datelog, sender_phone, message_id, message_text, raw_json, is_read, read_at, read_by, source, sent_by) 
         VALUES 
         ('$date','$wabaPhone','$message_id','".addslashes($concatenado)."','".addslashes($response)."',1,'$date',21,'bot',21)";
         $db->sqlPure($sql, false);
     }
-}
-
-function sendInteractiveButtons($from, $token, $phoneNumberId, $wabaPhone, $bodyText, $buttons, $enableBot=1) {
-    global $db;
-    usleep(200000);
-    if ($enableBot == 0) {
-        logger("Bot deshabilitado desde cat_location.");
-        return;
-    }
-    $buttonsList = [];
-    foreach ($buttons as $btn) {
-        $buttonsList[] = [
-            "type" => "reply",
-            "reply" => [
-                "id" => $btn["id"],
-                "title" => $btn["title"]
-            ]
-        ];
-    }
-    
-    $payload = [
-        "messaging_product" => "whatsapp",
-        "to" => $from,
-        "type" => "interactive",
-        "interactive" => [
-            "type" => "button",
-            "body" => [
-                "text" => $bodyText
-            ],
-            "action" => [
-                "buttons" => $buttonsList
-            ]
-        ]
-    ];
-    logger("infoButtons: ".json_encode($buttons));
-       $button_titles = array_map(function($b){ 
-        return $b['title']; 
-    }, $buttons);
-        logger("button_titles: ".json_encode($button_titles));
-    $concatenado = $bodyText . " | " . implode(" | ", $button_titles);
-    
-    $url = "https://graph.facebook.com/v23.0/$phoneNumberId/messages";
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "Authorization: Bearer $token",
-        "Content-Type: application/json"
-    ]);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response = curl_exec($ch);
-    curl_close($ch);
-    
-
-    logger(">>>".$concatenado);
-    logger("Botones interactivos enviados: ".$response);
-        // ====== Guardar en BD ======
-    $decoded = json_decode($response, true);
-    if (isset($decoded['messages'][0]['id'])) {
-        $message_id = $decoded['messages'][0]['id'];
-        $date = date("Y-m-d H:i:s");
-        $sql = "INSERT INTO waba_callbacks 
-        (datelog, sender_phone, message_id, message_text, raw_json, is_read, read_at, read_by, source, sent_by) 
-        VALUES 
-        ('$date','$wabaPhone','$message_id','".addslashes($concatenado)."','".addslashes($response)."',1,'$date',21,'bot',21)";
-        $db->sqlPure($sql, false);
-    }
-
-    return $response;
 }
 
 //------------------------------ END FUNCTIONS ----------------------------------//
@@ -945,11 +742,11 @@ function insertCallbackMessage($db, $from, $message_id, $body, $raw_json) {
 }
 
 function logger($msg){
-    // file_put_contents('procesarRespuesta.txt', date("Y-m-d H:i:s").":".print_r($msg, true) . PHP_EOL, FILE_APPEND);
+    file_put_contents('procesarRespuesta.txt', date("Y-m-d H:i:s").":".print_r($msg, true) . PHP_EOL, FILE_APPEND);
 }
 
 function getMediaUrl($media_id, $access_token) {
-    $url = "https://graph.facebook.com/v23.0/$media_id";
+    $url = "https://graph.facebook.com/v21.0/$media_id";
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "Authorization: Bearer $access_token"
@@ -972,5 +769,4 @@ function downloadMedia($file_url, $access_token, $save_path) {
 
     file_put_contents($save_path, $data);
 }
-
 ?>

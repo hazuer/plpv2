@@ -49,9 +49,10 @@ AND p.id_location IN ($id_location)
 AND p.id_status IN(1,2,5,6,7,8)";
 $packages = $db->select($sql);
 
-$sqlTemp     = "SELECT template FROM cat_template WHERE id_location IN ($id_location) LIMIT 1";
+$sqlTemp     = "SELECT id_template,template FROM cat_template WHERE id_location IN ($id_location) AND type_template IN(1) LIMIT 1";
 $user        = $db->select($sqlTemp);
-$templateMsj = $user[0]['template'];
+$idTemplateMsj = $user[0]['id_template'];
+$templateMsj   = $user[0]['template'];
 ?>
 <!DOCTYPE html>
 <html lang="es-MX">
@@ -78,7 +79,8 @@ $templateMsj = $user[0]['template'];
 
 
 		<script>
-         let templateMsj    = `<?php echo $templateMsj;?>`;
+         let idTemplateMsj    = `<?php echo $idTemplateMsj;?>`;
+		 let templateMsj    = `<?php echo $templateMsj;?>`;
          let uMarker        = `<?php echo $_SESSION["uMarker"];?>`;
          let uIdCatParcel   = `<?php echo $_SESSION["uIdCatParcel"];?>`;
          let largo          = `<?php echo LARGO;?>`;
@@ -100,6 +102,10 @@ $templateMsj = $user[0]['template'];
                 table.dataTable th:nth-child(10) {
                     display: none;
                 }
+
+				.btn-liberar {
+					display: none !important;
+				}
                 #lbl-title-location {
                     display: none;
                 }
@@ -151,15 +157,15 @@ $templateMsj = $user[0]['template'];
 		}
         </style>
         <script>
-    /*function truncateText() {
-//        const table = document.getElementById('tbl-packages');
-        //if (!table) return; // Evita errores si la tabla no existe
+    function truncateText() {
+        const table = document.getElementById('tbl-packages');
+        if (!table) return; // Evita errores si la tabla no existe
 
         const rows = table.querySelectorAll('tbody tr');
         rows.forEach(row => {
             const cells = row.querySelectorAll('td');
-            if (cells.length > 6) {
-                const cell = cells[6];
+            if (cells.length > 8) {
+                const cell = cells[8];
                 const text = cell.textContent.trim();
 
                 if (text.length > 10 && !cell.dataset.truncated) {
@@ -168,30 +174,32 @@ $templateMsj = $user[0]['template'];
                 }
             }
         });
-    }*/
+    }
 
-    //let lastWidth = window.innerWidth;
-    //let resizeTimer;
+    let lastWidth = window.innerWidth;
+    let resizeTimer;
 
     // Ejecuta al cargar
-    /*document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
         if (window.innerWidth <= 768) {
-            //truncateText();
+            truncateText();
         }
-    });*/
+    });
 
     // Optimiza el evento resize
-    /*window.addEventListener('resize', function() {
+    window.addEventListener('resize', function() {
         if (Math.abs(window.innerWidth - lastWidth) > 50) { // Solo si cambia más de 50px
             lastWidth = window.innerWidth;
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
                 if (window.innerWidth <= 768) {
-                    //truncateText();
+                    truncateText();
                 }
             }, 200);
         }
-    });*/
+    });
+
+	
 </script>
       </head>
 	<body class="dashboard dashboard_1">
@@ -236,7 +244,7 @@ $templateMsj = $user[0]['template'];
 												<th>messages</th>
 												<th>tdiast</th>
 												<th style="text-align: center; width:20%;">
-													<button type="button" id="confirmg" name="confirmg" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Confirmar Guías Seleccionadas">
+													<button type="button" id="confirmg" name="confirmg" class="btn btn-success btn-sm btn-confirm" data-toggle="tooltip" data-placement="top" title="Confirmar Guías Seleccionadas">
 														<i class="fa fa-flag-o fa-lg" aria-hidden="true"></i>
 													</button>
 													<button type="button" id="releaseg" name="releaseg" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Liberar Guías Seleccionadas">
@@ -281,13 +289,13 @@ $templateMsj = $user[0]['template'];
 													<div class="row">
 														<div class="col-md-4">
 														<?php if($d['id_status']==2 || $d['id_status']==5 || $d['id_status']==7){ ?>
-															<span class="badge badge-pill badge-success" style="cursor: pointer;" id="btn-tbl-liberar" title="Liberar">
+															<span class="badge badge-pill badge-success btn-liberar" style="cursor: pointer;" id="btn-tbl-liberar" title="Liberar">
 																<i class="fa fa-check-square-o fa-lg" aria-hidden="true"></i>
 															</span>
 														<?php }?>
 														</div>
 														<div class="col-md-4">
-															<span class="badge badge-pill badge-info" style="cursor: pointer;" id="btn-records" title="Editar">
+															<span class="badge badge-pill badge-info btn-edit" style="cursor: pointer;" id="btn-records" title="Editar">
 																<i class="fa fa-edit fa-lg" aria-hidden="true"></i>
 															</span>
 														</div>

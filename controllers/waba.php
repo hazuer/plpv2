@@ -26,11 +26,9 @@ switch ($_POST['option']) {
 		$id_location   = $_POST['id_location'];
 		$id_estatus    = $_POST['mBEstatus'];
 		$mbIdCatParcel = $_POST['mbIdCatParcel'];
-		$field2        = $_POST['field2'];
-		$field3        = $_POST['field3'];
-		$field4        = $_POST['field4'];
-		$field5        = $_POST['field5'];
-		$field6        = $_POST['field6'];
+		$nameTemplate = $_POST['nameTemplate'];
+		$camposPlantilla = json_decode($_POST['campos_plantilla'] ?? "{}", true);
+		$locationLnk = $_POST['location_lnk'];
 		$txtTemplate   = $_POST['txtTemplate'];
 		$tokenWaba     = $_POST['tokenWaba'];
 		$wabaPhone     = $_POST['phoneWaba'];
@@ -81,34 +79,54 @@ switch ($_POST['option']) {
 			$totalRegistros = count($idsArray);
 			$tguias         = "Total:".$totalRegistros." (Folio)-Guía: ".$folioGuias;
 
-			$fullTemplate = str_replace("usuario_db,", $customNameUser, $txtTemplate);
+			$fullTemplate = str_replace("usuario_db", $customNameUser, $txtTemplate);
+			$fullTemplate = str_replace("location_db", $locationLnk, $fullTemplate);
 			$fullTemplate = str_replace("folios_db", $tguias, $fullTemplate);
-			#var_dump($fullTemplate);
+
+			// valores de BD
+			$bdValues = [
+				"usuario_db"  => $customNameUser,
+				// "location_db" => $locationLnk,
+				"folios_db"   => $tguias
+			];
+
+			$componentParams = [];
+			// recorrer exactamente los placeholders tal como vienen
+			foreach ($camposPlantilla as $num => $valorCampo) {
+				// si es un placeholder marcado como valor de BD
+				if (substr($valorCampo, -3) === "_db") {
+
+					// si existe en el arreglo, se reemplaza
+					$realValue = $bdValues[$valorCampo] ?? "";
+					$componentParams[] = [
+						"type" => "text",
+						"text" => $realValue
+					];
+				} else {
+					// si no es de BD, se usa el valor ingresado por el usuario
+					$componentParams[] = [
+						"type" => "text",
+						"text" => $valorCampo
+					];
+				}
+			}
 
 			$data = [
 				"messaging_product" => "whatsapp",
 				"to" => "521".$number,
 				"type" => "template",
 				"template" => [
-					"name" => "order_pick_up_jt_im",
+					"name" => $nameTemplate,
 					"language" => ["code" => "es"],
 					"components" => [
 						[
 							"type" => "body",
-							"parameters" => [
-								["type" => "text", "text" => $customNameUser], //nombre
-								["type" => "text", "text" => $field2],         //ubicacion fisica y maps
-								["type" => "text", "text" => $field3],         // hora hoy
-								["type" => "text", "text" => $field4],         // hora mañana
-								["type" => "text", "text" => $field5],         //fecha dev
-								["type" => "text", "text" => $field6],         // hora dev
-								["type" => "text", "text" => $tguias]          //guias
-							]
+							"parameters" => $componentParams
 						]
 					]
 				]
 			];
-
+	
 			$url = "https://graph.facebook.com/v23.0/".$phoneNumberId."/messages";
 			#var_dump($url);
 			$ch = curl_init($url);
@@ -136,6 +154,10 @@ switch ($_POST['option']) {
 				$success  = 'true';
 				$message  = "Mensaje enviado a $number";
 				$newStatusPackage = ($id_estatus == 5 ? 5 : 2);
+
+				//restart bot buttons
+				$sql = "DELETE FROM waba_user_buttons WHERE phone = '521".$number."'";
+            	$db->sqlPure($sql, false);
 			} else {
 				//var_dump('false');
 				$success  = 'false';
@@ -166,8 +188,9 @@ switch ($_POST['option']) {
 
 				$date    = date("Y-m-d H:i:s");
 				$read_by = intval($_SESSION['uId']);
-				$sql = "INSERT INTO waba_callbacks (datelog, sender_phone, message_id, message_text, raw_json,is_read,read_at,read_by,source,id_location) 
-				VALUES ('$date', '$wabaPhone', '$message_id', '$fullTemplate', '$response',1,'$date', $read_by, 'template',$id_location)";
+				$sent_by = intval($_SESSION['uId']);
+				$sql = "INSERT INTO waba_callbacks (datelog, sender_phone, message_id, message_text, raw_json,is_read,read_at,read_by,source,id_location,sent_by) 
+				VALUES ('$date', '$wabaPhone', '$message_id', '".addslashes($fullTemplate)."', '$response',1,'$date', $read_by, 'template',$id_location,$sent_by)";
 				$inserted = $db->sqlPure($sql, false);
 			}
 		}else{
@@ -187,21 +210,29 @@ switch ($_POST['option']) {
 			exit;
 		}
 
-		$sql = "SELECT 
+		$sql="SELECT 
 			id_log,
 			datelog,
 			sender_phone,
 			message_text,
+			source,
+			message_id,
 			CASE 
 				WHEN sender_phone = '".$wabaPhone."' THEN 'outgoing' 
 				ELSE 'incoming' 
-			END AS message_type 
-			FROM waba_callbacks 
-			WHERE 
+			END AS message_type,
+			CASE
+				WHEN source IN ('template', 'waba_response_to_user','bot')
+				THEN (SELECT user FROM users WHERE id = sent_by LIMIT 1)
+				ELSE ''
+			END AS who_sent 
+		FROM waba_callbacks 
+		WHERE 
 			(sender_phone = '".$wabaPhone."' AND raw_json LIKE '%".$phone."%') 
-			OR 
-			(sender_phone = '".$phone."') 
-			ORDER BY datelog ASC LIMIT 50 
+			OR (sender_phone = '".$phone."') 
+		GROUP BY message_id 
+		ORDER BY id_log DESC 
+		LIMIT 50
 		";
 		$mensajes = $db->select($sql);
 
@@ -222,6 +253,10 @@ switch ($_POST['option']) {
 			read_by = " . intval($_SESSION['uId']) . " 
 		WHERE sender_phone = '" .$tophone . "' AND is_read = 0";
 		$rst = $db->sqlPure($sql, false);
+
+		$sql  = "INSERT INTO waba_user_buttons (phone, button_id, datelog, bot_active) 
+        		VALUES ('$tophone', 'btn_horario', '$date', 0)";
+    	$db->sqlPure($sql, false);
 		echo json_encode(['success' => true, 'data' => $rst]);
 	break;
 		
@@ -273,11 +308,15 @@ switch ($_POST['option']) {
 			$message_id = $decoded['messages'][0]['id']; // ID que regresa la API
 			$date    = date("Y-m-d H:i:s");
 			$read_by = intval($_SESSION['uId']);
-			$sql = "INSERT INTO waba_callbacks (datelog, sender_phone, message_id, message_text, raw_json,is_read,read_at,read_by,source,id_location) 
-            VALUES ('$date', '$wabaPhone', '$message_id', '$msj', '$response',1,'$date', $read_by,'waba_response_to_user',$id_location)";
+			$sent_by = intval($_SESSION['uId']);
+			$sql = "INSERT INTO waba_callbacks (datelog, sender_phone, message_id, message_text, raw_json,is_read,read_at,read_by,source,id_location,sent_by) 
+            VALUES ('$date', '$wabaPhone', '$message_id', '".addslashes($msj)."', '$response',1,'$date', $read_by,'waba_response_to_user',$id_location,$sent_by)";
 			$inserted = $db->sqlPure($sql, false);
 
 			if ($inserted) {
+				$sql  = "INSERT INTO waba_user_buttons (phone, button_id, datelog, bot_active) 
+        		VALUES ('$tophone', 'btn_horario', '$date', 0)";
+    			$db->sqlPure($sql, false);
 				echo json_encode(['success' => true, 'data' => $decoded]);
 			} else {
 				echo json_encode(['success' => false, 'message' => 'Error al guardar en DB']);
@@ -287,4 +326,111 @@ switch ($_POST['option']) {
 		}
 
 	break;
+
+	case 'saveTempMeta':
+		$result   = [];
+		$success  = 'false';
+		$dataJson = [];
+		$message  = 'Error al guardar la plantilla';
+
+		$name     = $_POST['mAdtName'];
+		$id_cat_parcel = $_POST['mAdtParcel'];
+		$template = $_POST['mAdtPlantilla'];
+		try{
+
+			$sql= "INSERT INTO cat_template (name, template, id_location, type_template, id_cat_parcel) 
+				VALUES 
+			('".$name."', '".$template."', 1, 2, ".$id_cat_parcel.")";
+			$newId = $db->sqlPure($sql, false);
+			$result = [
+				'success'  => "true",
+				'dataJson' => [$newId],
+				'message'  => "Plantilla guardada"
+			];
+		}catch (Exception $e) {
+			$result = [
+				'success'  => $success,
+				'dataJson' => $dataJson,
+				'message'  => $message.": ".$e->getMessage()
+			];
+		}
+		echo json_encode($result);
+
+	break;
+
+	case 'getTemplateMeta':
+		$idTemplate     = $_POST['idTemplate'];
+		$sql  = "SELECT template FROM cat_template WHERE 1 AND id_template = ".$idTemplate;
+		$rstT = $db->select($sql);
+		$template = $rstT[0]['template'];
+		$result = [
+				'success'  => "true",
+				'dataJson' => $template,
+				'message'  => ''
+			];
+		echo json_encode($result);
+	break;
+
+	case 'infoGuias':
+		$tophone    = $_POST['tophone'] ?? '';
+
+		if (!$tophone) {
+			echo json_encode([]);
+			exit;
+		}
+		$phone10 = substr($tophone, -10);
+		$sql = "SELECT 
+			cp.parcel,
+			p.tracking,
+			p.folio,
+			s.status_desc
+		FROM
+			package p 
+			INNER JOIN cat_contact cc ON cc.id_contact = p.id_contact 
+			INNER JOIN cat_parcel cp ON cp.id_cat_parcel = p.id_cat_parcel 
+			INNER JOIN cat_status s ON s.id_status = p.id_status 
+		WHERE 
+			cc.phone IN('".$phone10."') 
+			AND p.id_status NOT IN(3,4,8)";
+		$rst   = $db->select($sql);
+		$total = count($rst);
+
+		$jsonRst = ['success' => false, 'data' => []];
+		if ($total >= 1) {
+			$jsonRst = ['success' => true, 'data' => $rst];
+		}
+		echo json_encode($jsonRst);
+	break;
+
+	case 'deleteTemplateWaba':
+		$id_template     = $_POST['id_template'];
+		$sql = "DELETE FROM cat_template WHERE id_template = $id_template";
+		$db->sqlPure($sql, false);
+		echo json_encode(['success' => true, 'data' => '']);
+	break;
+	
+	case 'loadPhonesAuto':
+		$id_location   = $_POST['id_location'];
+		$mbIdCatParcel   = $_POST['mbIdCatParcel'];
+		$idParceIn       = ($mbIdCatParcel==99) ? '1,2,3': $mbIdCatParcel;
+		$id_estatus       = $_POST['mBEstatus'];
+		$sql = "SELECT DISTINCT cc.phone 
+			FROM package p 
+			INNER JOIN cat_contact cc 
+				ON cc.id_contact = p.id_contact 
+			WHERE 
+				p.id_location IN (".$id_location.") 
+				AND p.id_status IN (".$id_estatus.") 
+				AND p.id_cat_parcel IN (".$idParceIn.") 
+				ORDER BY cc.phone ASC";
+		$rst   = $db->select($sql);
+		$total = count($rst);
+		if ($total >= 1) {
+			$jsonRst = ['success' => true, 'data' => $rst];
+		}else{
+			$jsonRst = ['success' => false, 'data' => []];
+		}
+		echo json_encode($jsonRst);
+	break;
+
 }

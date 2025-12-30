@@ -65,6 +65,11 @@ $tpm = 0;
 foreach ($rst as $item) {
     $tpm += intval($item['count']); // Convertir a entero antes de sumar
 }
+
+//Porcentaje entrega por usuario
+$sqlPorcentaje="SELECT id,user 
+FROM users";
+$rstpu = $db->select($sqlPorcentaje);
 ?>
 <!DOCTYPE html>
 <html lang="es-MX">
@@ -112,12 +117,13 @@ foreach ($rst as $item) {
                                 </div> -->
                             </div>
                             <div class="row column1">
-                                <div class="col-md-12 col-lg-4 d-flex">
+                                <div class="col-md-12 col-lg-2 d-flex">
                                     <div class="card w-100 shadow-sm mb-4">
                                         <div class="card-header text-center bg-light">
                                             <h4 class="mb-0">En Ruta</h4>
                                         </div>
                                         <div class="card-body text-center">
+                                            <br>
                                             <div class="d-flex justify-content-center flex-wrap gap-2">
                                                 <span class="badge px-3 py-2" style="background:#03a9f4; color:#fff; font-size:14px; font-weight:bold;">
                                                 <?php echo count($tpackages); ?></span>
@@ -131,12 +137,13 @@ foreach ($rst as $item) {
                                     </div>
                                 </div>
 
-                                <div class="col-md-12 col-lg-4 d-flex">
+                                <div class="col-md-12 col-lg-2 d-flex">
                                     <div class="card w-100 shadow-sm mb-4">
                                         <div class="card-header text-center bg-light">
                                             <h4 class="mb-0">Sin rotular</h4>
                                         </div>
                                         <div class="card-body text-center">
+                                            <br>
                                             <div class="d-flex justify-content-center flex-wrap gap-2">
                                                 <span class="badge px-3 py-2" style="background:#ff9800 ; color:#fff; font-size:14px; font-weight:bold;">
                                                 <?php echo count($tpre); ?>
@@ -150,12 +157,13 @@ foreach ($rst as $item) {
                                     </div>
                                 </div>
 
-                                <div class="col-md-12 col-lg-4 d-flex">
+                                <div class="col-md-12 col-lg-2 d-flex">
                                     <div class="card w-100 shadow-sm mb-4">
                                         <div class="card-header text-center bg-light">
                                             <h4 class="mb-0">Mensajes nuevos</h4>
                                         </div>
                                         <div class="card-body text-center">
+                                            <br>
                                             <div class="d-flex justify-content-center flex-wrap gap-2">
                                                 <span class="badge px-3 py-2" style="background:#009688  ; color:#fff; font-size:14px; font-weight:bold;">
                                                 <?php echo $totalMensajeSinLeer; ?>
@@ -165,6 +173,213 @@ foreach ($rst as $item) {
                                                 <i class="fa fa-whatsapp green_color"></i>
                                                 </div>
                                             </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="col-md-12 col-lg-3 d-flex">
+                                    <div class="card w-100 shadow-sm mb-4">
+                                        <div class="card-header text-center bg-light">
+
+<?php 
+$andFechasrotulacion = "";
+$rFIniLib = date('Y-m-d');
+$rFFinLib = date('Y-m-d');
+$andFechasrotulacion = " AND p.v_date BETWEEN '$rFIniLib 00:00:00' AND '$rFFinLib 23:59:59'";
+
+$rstRot = [];
+$tpr=0;
+foreach ($rstpu as $u) {
+    $userId = $u['id'];
+    $sql = "SELECT COUNT(p.id_package) AS total_p 
+            FROM package p 
+            WHERE 1
+            AND p.v_user_id = $userId 
+            AND p.id_location IN ($id_location) 
+            $andFechasrotulacion";
+
+    $row = $db->select($sql);
+    
+    if($row[0]['total_p']>0){
+        $rstRot[] = [
+            'id'      => $u['id'],
+            'user'    => $u['user'],
+            'rotulados_hoy' => $row[0]['total_p']
+        ];
+        $tpr = $tpr+$row[0]['total_p'];
+    }
+}
+
+$lbl_rot = [];
+$dt_pu   = [];
+foreach ($rstRot as $r) {
+    $lbl_rot[] = $r['user'];
+    $dt_pu[]  = (int)$r['rotulados_hoy'];
+}
+?>
+                                        <h4 class="mb-0">P. Rotulados <?php echo $tpr;?></h4>
+                                        </div>
+                                        <div class="card-body text-center">
+<div style="width: 100%; max-width: 250px; height: 100%;">
+    <canvas id="cht_rot"></canvas>
+</div>
+<script>
+const lbl_rot    = <?php echo json_encode($lbl_rot, JSON_UNESCAPED_UNICODE); ?>;
+const dt_val_rot = <?php echo json_encode($dt_pu); ?>;
+if (!lbl_rot || lbl_rot.length === 0) {
+    document.getElementById('cht_rot').insertAdjacentHTML('afterend', '<p>No hay entregas para mostrar.</p>');
+} else {
+    const dtx_rot = document.getElementById('cht_rot').getContext('2d');
+const col_rot = lbl_rot.map(() => {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    return `rgba(${r}, ${g}, ${b}, 0.7)`;
+});
+const bor_rot = col_rot.map(c => c.replace("0.7", "1"));
+
+    new Chart(dtx_rot, {
+        type: 'bar',
+        data: {
+            labels: lbl_rot,
+            datasets: [{
+                label: 'Paquetes rotulados hoy',
+                data: dt_val_rot,
+                backgroundColor: col_rot,
+                borderColor: bor_rot,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ' ' + context.parsed.y + ' rotulados';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0,
+                        stepSize: 10   // ← incrementos de 25 en 25
+                    },
+                    title: { display: true, text: 'P. rotulados' }
+                },
+                x: {
+                    title: { display: true, text: 'Usuario' }
+                }
+            }
+        }
+    });
+}
+</script>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 col-lg-3 d-flex">
+                                    <div class="card w-100 shadow-sm mb-4">
+                                        <div class="card-header text-center bg-light">
+<?php 
+$andFechasLiberacion = "";
+$rFIniLib = date('Y-m-d');
+$rFFinLib = date('Y-m-d');
+$andFechasLiberacion = " AND p.d_date BETWEEN '$rFIniLib 00:00:00' AND '$rFFinLib 23:59:59'";
+
+$resultados = [];
+$tpe=0;
+foreach ($rstpu as $u) {
+    $userId = $u['id'];
+    $sql = "SELECT COUNT(p.id_package) AS total_p 
+            FROM package p 
+            WHERE p.id_status IN (3) 
+            AND p.d_user_id = $userId 
+            AND p.id_location IN ($id_location) 
+            $andFechasLiberacion";
+
+    $row = $db->select($sql);
+    if($row[0]['total_p']>0){
+        $resultados[] = [
+            'id'      => $u['id'],
+            'user'    => $u['user'],
+            'entregados_hoy' => $row[0]['total_p']
+        ];
+        $tpe = $tpe+$row[0]['total_p'];
+    }
+}
+
+$lbl_pu = [];
+$dt_pu   = [];
+foreach ($resultados as $r) {
+    $lbl_pu[] = $r['user'];              // nombre del usuario
+    $dt_pu[]  = (int)$r['entregados_hoy']; // paquetes entregados
+}
+?>
+                                        <h4 class="mb-0">P. Entregados <?php echo $tpe;?></h4>
+                                        </div>
+                                        <div class="card-body text-center">
+<div style="width: 100%; max-width: 250px; height: 100%;">
+    <canvas id="chart_pu"></canvas>
+</div>
+<script>
+const lbl_pu    = <?php echo json_encode($lbl_pu, JSON_UNESCAPED_UNICODE); ?>;
+const dt_val_pu = <?php echo json_encode($dt_pu); ?>;
+if (!lbl_pu || lbl_pu.length === 0) {
+    document.getElementById('chart_pu').insertAdjacentHTML('afterend', '<p>No hay entregas para mostrar.</p>');
+} else {
+    const puctx = document.getElementById('chart_pu').getContext('2d');
+const colors = lbl_pu.map(() => {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    return `rgba(${r}, ${g}, ${b}, 0.7)`;
+});
+
+const borders = colors.map(c => c.replace("0.7", "1"));
+    new Chart(puctx, {
+        type: 'bar',
+        data: {
+            labels: lbl_pu,
+            datasets: [{
+                label: 'Paquetes entregados hoy',
+                data: dt_val_pu,
+                backgroundColor: colors,
+                borderColor: borders,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ' ' + context.parsed.y + ' entregados';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0,
+                        stepSize: 10   // ← incrementos de 25 en 25
+                    },
+                    title: { display: true, text: 'P. entregados' }
+                },
+                x: {
+                    title: { display: true, text: 'Usuario' }
+                }
+            }
+        }
+    });
+}
+</script>
                                         </div>
                                     </div>
                                 </div>
@@ -338,19 +553,6 @@ foreach ($rst as $item) {
                                         n.n_date DESC LIMIT 1";
                                     $dtsWamid = $db->select($sqlGetWamid);
 
-                                    /*$sqlGuias="SELECT 
-                                    p.tracking 
-                                    FROM 
-                                        package p 
-                                    INNER JOIN notification n ON n.id_package = p.id_package 
-                                    WHERE 1 
-                                        AND n.message_id LIKE 'wamid%' 
-                                        AND n.message_id IN ('".$item['message_id']."') 
-                                    ORDER BY p.tracking ASC";
-                                    $dtsGuias = $db->select($sqlGuias);
-                                    $trackings = array_column($dtsGuias, "tracking");
-                                    $guias = implode(", ", $trackings);*/
-
                                     // Buscar último estatus de este message_id
                                     $sqlWabaStatus = "SELECT status_name, datelog, raw_json
                                         FROM waba_status 
@@ -370,8 +572,6 @@ foreach ($rst as $item) {
 
                                     if (!isset($statusCounts[$statusName])) $statusCounts[$statusName] = 0;
                                     $statusCounts[$statusName]++;
-
-                                    #$statusDate = $statusRow ? $statusRow[0]['datelog'] : '-';
                                 }
                             ?>
                                 <div class="white_shd full" style="display: block !important;">
@@ -387,7 +587,9 @@ foreach ($rst as $item) {
                                                     $labels = array_keys($statusCounts);
                                                     $data = array_values($statusCounts);
                                                 ?>
-                                                <canvas id="statusChart" width="600" height="320"></canvas>
+                                                <div style="width: 100%; max-width: 600px; height: 300px;">
+                                                    <canvas id="statusChart"></canvas>
+                                                </div>
                                                 <script>
                                                     // Datos pasados desde PHP
                                                     const labels     = <?php echo json_encode($labels, JSON_UNESCAPED_UNICODE); ?>;
@@ -456,6 +658,7 @@ foreach ($rst as $item) {
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                         <!-- ---------- -->
                     </div>

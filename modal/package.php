@@ -89,10 +89,22 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-10">
                             <div class="form-group">
-                                <label for="tracking"><b>* Guía:</b></label>
+                                <label for="tracking"><b>* Guía:</b></label> 
                                 <input type="text" class="form-control" name="tracking" id="tracking" value="" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" 
+                                    type="checkbox" 
+                                    name="checkG" 
+                                    id="checkG" 
+                                    value="1" checked>
+                                <label class="form-check-label" for="checkG">
+                                    <b>Validar</b>
+                                </label>
                             </div>
                         </div>
                     </div>

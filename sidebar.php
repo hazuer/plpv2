@@ -32,7 +32,7 @@ switch ($_SESSION["uId"]) {
    <div class="sidebar_blog_1">
       <div class="sidebar-header">
          <div class="logo_section">
-            <a href="dashboard.php"><img class="logo_icon img-responsive" src="images/logo/logo_icon.png" alt="#" /></a>
+            <a href="dashboard.php"><img id="profileImg" class="logo_icon img-responsive" src="images/logo/logo_icon.png" alt="#" /></a>
          </div>
       </div>
       <div class="sidebar_user_info">
@@ -50,7 +50,7 @@ switch ($_SESSION["uId"]) {
       <h4>Panel</h4>
       <ul class="list-unstyled components">
          <li>
-            <a href="dashboard.php" class="onclikload"><i class="fa fa-home blue2_color"></i> <span>Dashboard</span></a>
+            <a href="dashboard.php" class="onclikload"><i class="fa fa-dashboard blue2_color"></i> <span>Dashboard</span></a>
          </li>
          <li>
             <a href="packages.php" class="onclikload"><i class="fa fa-cubes blue1_color"></i> <span>Paquetes</span></a>
@@ -65,11 +65,11 @@ switch ($_SESSION["uId"]) {
             <a href="contacts.php" class="onclikload"><i class="fa fa-users red_color"></i> <span>Contactos</span></a>
          </li>
          <li>
-            <a href="admin.php" class="onclikload"><i class="fa fa-dashboard  yellow_color"></i> <span>Admin</span></a>
+            <a href="admin.php" class="onclikload"><i class="fa fa-gears  yellow_color"></i> <span>Admin</span></a>
          </li>
          <li>
-			<a href="#" id="logoff"><i class="fa fa-sign-out orange_color"></i> <span>Salir</span></a>
-		</li>
+			   <a href="#" id="logoff"><i class="fa fa-sign-out orange_color"></i> <span>Salir</span></a>
+		   </li>
       </ul>
    </div>
 </nav>

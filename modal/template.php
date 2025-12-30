@@ -18,49 +18,7 @@
                             </select>
                         </div>
                     </div>
-                    <!--<div class="col-md-4">
-                        <div class="form-group">
-                            <label for="mTDia"><b>Día:</b></label>
-                            <select name="mTDia" id="mTDia" class="form-control">
-                                <option value="0">Otro</option>
-                                <option value="1">Domingo</option>
-                                <option value="2">Lunes</option>
-                                <option value="3">Martes</option>
-                                <option value="4">Míercoles</option>
-                                <option value="5">Jueves</option>
-                                <option value="6">Viernes</option>
-                                <option value="7">Sábado</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="mTName"><b>* Nombre:</b></label>
-                            <input type="text" class="form-control" name="mTName" id="mTName" value="" autocomplete="off">
-                        </div>
-                    </div>-->
                 </div>
-                <!--<div class="row">
-                    <div class="col-md-2"  style="margin-bottom: 20px;">
-                        <label for="mTTemplate"><b>Variables:</b></label>
-                    </div>
-                    <div class="col-md-2">
-                        <span class="badge badge-dark">_Ubicación_</span>
-                    </div>
-                    <div class="col-md-2">
-                        <span class="badge badge-dark">_Día_entrega_1_</span>
-                    </div>
-                    <div class="col-md-2">
-                        <span class="badge badge-dark">_Día_entrega_2_</span>
-                    </div>
-                    <div class="col-md-2">
-                        <span class="badge badge-dark">_Día_devolución_</span>
-                    </div>
-                    <div class="col-md-2">
-                        <span class="badge badge-dark">_Año_</span>
-                    </div>
-                </div>
--->
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">

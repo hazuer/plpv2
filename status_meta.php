@@ -137,14 +137,14 @@ $fechaDev = date("d/m/Y", strtotime("+2 days"));
 										<div class="row">
 											<div class="col-md-2">
 												<div class="form-group">
-													<label for="smGuia"><b>Guía:</b></label>
-													<input type="text" class="form-control" name="smGuia" id="smGuia" value="<?php echo $smGuia; ?>" autocomplete="off">
+													<label for="smGuia"><b></b></label>
+													<input type="text" placeholder="Búscar Guía" class="form-control" name="smGuia" id="smGuia" value="<?php echo $smGuia; ?>" autocomplete="off">
 												</div>
 											</div>
                                             <div class="col-md-2">
 												<div class="form-group">
-													<label for="smPhone"><b>Télefono:</b></label>
-													<input type="text" class="form-control" name="smPhone" id="smPhone" value="<?php echo $smPhone; ?>" autocomplete="off">
+													<label for="smPhone"><b></b></label>
+													<input type="text" placeholder="Búscar Télefono" class="form-control" name="smPhone" id="smPhone" value="<?php echo $smPhone; ?>" autocomplete="off">
 												</div>
 											</div>
                                              <div class="col-md-1"><br>

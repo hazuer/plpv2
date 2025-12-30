@@ -179,7 +179,7 @@ class DB {
 
         try {
             // Limpieza
-            $sql = preg_replace('!\s+!', ' ', str_replace(["\r", "\n", "\r\n"], '', $sql));
+            //$sql = preg_replace('!\s+!', ' ', str_replace(["\r", "\r\n"], '', $sql));
 
             // Se inicia una nueva transaccion de lectura y escritura
             $this->conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);

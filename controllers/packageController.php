@@ -358,7 +358,7 @@ switch ($_POST['option']) {
 		$jsonPakage = $_POST['listPackageRelease'];
 		try {
 
-			$sql="SELECT id_status
+			$sql="SELECT id_status,id_contact
 		   	FROM package
 		   	WHERE tracking IN ('$tracking')
 			AND id_location IN ($id_location)
@@ -369,6 +369,7 @@ switch ($_POST['option']) {
 				$message  = 'Paquete no encontrado';
 			}else{
 				$idEstatus = $checkRelease[0]['id_status'];
+				$idContact = $checkRelease[0]['id_contact'];
 				switch ($idEstatus) {
 					case 1:
 					case 6:
@@ -427,15 +428,22 @@ switch ($_POST['option']) {
 						$rst = $db->update('package',$data," `tracking` = '$tracking'");
 						$listPackageRelease   = json_decode($jsonPakage, true);
 						$inList = implode(", ", $listPackageRelease);
+						//Check if there are packages to be released
+						$sqlCP = "SELECT phone FROM cat_contact WHERE id_contact IN($idContact) LIMIT 1";
+						$rstP  = $db->select($sqlCP);
+						$phone = $rstP[0]['phone'] ?? 0;
+
 						$sql ="SELECT DISTINCT 
 						p.tracking,
-						cc.phone,
 						cc.contact_name receiver,
 						p.folio 
 						FROM package p 
 						INNER JOIN cat_contact cc ON cc.id_contact=p.id_contact 
-						WHERE tracking IN($inList) AND p.id_location IN($id_location) 
-						AND id_status IN (3)";
+						WHERE 1
+						AND tracking NOT IN($inList) 
+						AND id_status NOT IN(3,4,5,8)
+						AND cc.phone IN('".$phone."')
+						AND p.id_location IN($id_location)";
 						$records = $db->select($sql);
 						$dataJson = $records;
 						break;
@@ -470,9 +478,20 @@ switch ($_POST['option']) {
 			cc.contact_name,
 			un.user,
 			n.message,
-			sid,
 			CASE 
-				WHEN message_id = '0' THEN 'Personal'
+				WHEN n.message_id = '0' THEN n.sid
+				ELSE CONCAT_WS(
+					' → ',
+					n.sid,
+					GROUP_CONCAT(
+						CONCAT(ws.status_name, ' (', ws.datelog, ')')
+						ORDER BY ws.datelog ASC
+						SEPARATOR ' → '
+					)
+				)
+			END AS sid,
+			CASE 
+				WHEN n.message_id = '0' THEN 'Personal'
 				ELSE 'Meta Waba'
 			END AS t_cta 
 			FROM 
@@ -480,9 +499,11 @@ switch ($_POST['option']) {
 			INNER JOIN users un ON un.id = n.n_user_id 
 			INNER JOIN package p  ON p.id_package = n.id_package 
 			INNER JOIN cat_contact cc ON cc.id_contact = p.id_contact 
+			LEFT JOIN waba_status ws ON ws.message_id = n.message_id
 			WHERE 
 			n.id_package IN($id_package) 
-			ORDER  BY n.n_date DESC";
+			GROUP BY n.id_notification 
+			ORDER BY n.n_date DESC";
 		$success  = 'true';
 		$dataJson = $db->select($sql);
 		$message  = 'ok';
@@ -582,11 +603,11 @@ switch ($_POST['option']) {
 		$dataJson = [];
 		$message  = 'Error al guardar la plantilla';
 
-		$id_location      = $_POST['id_location'];
+		$id_template      = $_POST['idTemplateMsj'];
 		$data['template'] = $_POST['mTTemplate'];
 		try {
 			$success  = 'true';
-			$dataJson = $db->update('cat_template',$data," `id_location` = $id_location");
+			$dataJson = $db->update('cat_template',$data," `id_template` = $id_template");
 			$message  = 'Actualizado';
 			$result = [
 				'success'  => $success,
@@ -939,7 +960,7 @@ async function sendMessageWhats(client, chatId, fullMessage, iconBot) {
 		$listIds = explode(",", $idsx);
 		$totPaqPorLiberar = count($listIds);
 		try {
-			$sql="SELECT p.id_status,p.folio,cs.status_desc 
+			$sql="SELECT p.id_status,p.folio,cs.status_desc,p.id_contact 
 		   	FROM package p 
 		   	INNER JOIN cat_status cs ON cs.id_status=p.id_status 
 		   	WHERE p.id_package IN ($idsx) 
@@ -947,6 +968,33 @@ async function sendMessageWhats(client, chatId, fullMessage, iconBot) {
 			AND p.id_status IN (2,5,7)";
 			$checkRelease = $db->select($sql);
 			$totalPaqueteDisponibles = count($checkRelease);
+			
+			//check if all are the same contact
+			$idContact = $checkRelease[0]['id_contact'] ?? 0;
+			$sqlCP = "SELECT phone FROM cat_contact WHERE id_contact IN($idContact) LIMIT 1";
+			$rstP  = $db->select($sqlCP);
+			$phone = $rstP[0]['phone'] ?? 0;
+
+			$sql ="SELECT DISTINCT 
+				p.tracking,
+				cc.contact_name receiver,
+				p.folio 
+				FROM package p 
+				INNER JOIN cat_contact cc ON cc.id_contact=p.id_contact 
+				WHERE 1
+				AND p.id_package NOT IN($idsx) 
+				AND id_status NOT IN(3,4,5,8)
+				AND cc.phone IN('".$phone."')
+				AND p.id_location IN($id_location)";
+			$records = $db->select($sql);
+			if(count($records)>0){
+				echo json_encode([
+					'success'  => 'error',
+					'dataJson' => $records,
+					'message'  => "No es posible realizar una entrega parcial. Selecciona todos los paquetes del mismo destinatario para completar la liberación. \nTeléfono: $phone"
+				]);
+				return;
+			}
 
 			if($totPaqPorLiberar==$totalPaqueteDisponibles){
 				$success="true";
@@ -1616,6 +1664,14 @@ async function sendMessageWhats(client, chatId, fullMessage, iconBot) {
 
 		echo json_encode($result);
 
+	break;
+
+	case 'onOffBot':
+		$enable      = $_POST['enable'];
+		$id_location = $_POST['id_location'];
+		$data['enable_bot'] = $enable;
+		$result = $db->update('cat_location',$data," `id_location` = $id_location");
+		echo json_encode($result);
 	break;
 }
 

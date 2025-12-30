@@ -25,45 +25,6 @@
     box-shadow: 0 0 5px rgba(3,169,244,0.4);
 }
 </style>
-<!-- <div id="banner-festejo" class="alert alert-success text-center mb-0 py-3" style="font-size: 1.2rem; background: linear-gradient(90deg, #ffcc00, #ff6699); color: white; font-weight: bold;">
-  🎂 ¡Feliz cumpleaños User! 🎉
-</div> -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script> -->
-<script>
-  // Lista de canciones
-  /*const canciones = [
-    "mananitas.mp3",
-    "mariachi.mp3",
-    "son.mp3"
-  ];
-  let reproductor = new Audio();
-  let confetiIntervalo = null;
-  function lanzarConfeti() {
-    confetti({
-      particleCount: 150,
-      spread: 120,
-      origin: { y: 0.6 }
-    });
-  }
-  function lanzarConfetiYMusica() {
-    // 🎶 Selección aleatoria de canción
-    const aleatoria = canciones[Math.floor(Math.random() * canciones.length)];
-    reproductor.src = aleatoria;
-    reproductor.play();
-    // 🚀 Inicia confeti en intervalos mientras la canción suena
-    if (confetiIntervalo) clearInterval(confetiIntervalo);
-    confetiIntervalo = setInterval(lanzarConfeti, 800);
-    // Cuando termine la música, parar confeti
-    reproductor.onended = () => {
-      clearInterval(confetiIntervalo);
-      confetiIntervalo = null;
-    };
-  }
-  // Escuchar clic en el banner
-  document.getElementById("banner-festejo").addEventListener("click", lanzarConfetiYMusica);
-  // Lanzar automáticamente al cargar la página
-  window.onload = lanzarConfeti;*/
-</script>
 <div class="topbar">
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="full">
@@ -79,7 +40,7 @@
             $colorActiveMenu = '';
             $nameOptionMenu      = '';
             if($pagina=='packages'){ $colorActiveMenu="#2196f3"; $nameOptionMenu='Paquetes'; }
-            if($pagina=='whatsapp' || $pagina=='status_meta'){$colorActiveMenu="#009688"; $nameOptionMenu='WhatsApp'; }
+            if($pagina=='whatsapp' || $pagina=='status_meta' || $pagina=='admin_templates'){$colorActiveMenu="#009688"; $nameOptionMenu='WhatsApp'; }
             if($pagina=='reports' || $pagina=='reportspe'|| $pagina=='prereg' || $pagina=='audit'){ $colorActiveMenu="#673ab7"; $nameOptionMenu='Reportes'; }
             if($pagina=='contacts'){ $colorActiveMenu="#e91e63"; $nameOptionMenu='Contactos'; }
             if($pagina=='admin'){ $colorActiveMenu="#ff9800"; $nameOptionMenu='Admin'; }
@@ -107,10 +68,12 @@
                                     <a href="#" id="btn-sync"><span>Guías no liberadas</span></a>
                                 <?php
                                 }
-                                if($pagina=='whatsapp' || $pagina=='status_meta'){
+                                if($pagina=='whatsapp' || $pagina=='status_meta' || $pagina=='admin_templates'){
                                 ?>
                                  	<!--mesajes-->
-									<a href="whatsapp.php"><span>Mensajes nuevos</span></a>
+									<a href="whatsapp.php"><span>Chats</span></a>
+                                    <a href="#" id="new-template"><span>Nueva plantilla meta</span></a>
+                                    <a href="admin_templates.php"><span>Admin plantillas meta</span></a>
 									<a href="#" id="waba-template"><span>Envío de mensajes meta</span></a>
                                     <a href="status_meta.php"><span>Estatus mensajes enviados</span></a>
                                 <?php
@@ -131,6 +94,7 @@
                                 if($pagina=='admin'){
 								?>
                                  <a href="admin.php"><span>Inventario</span></a>
+                                 <a href="#" id="onOffBot" data-enable="<?php echo $enable_bot; ?>"><span><?php echo $text_enable_bot; // from admin.php?></span></a>
                                  <!-- <a href="dashboard.html"><span>Cambiar estatus</span></a>
                                  <a href="dashboard.html"><span>Cambiar ubicación</span></a> -->
                                  <?php 

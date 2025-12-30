@@ -238,16 +238,43 @@ $(document).ready(function() {
 			}
 		}).done(function(response) {
 			swal.close();
-			if(response.success==='true'){
-				swal(guia, response.message, "success");
-			}else {
-				swal(guia, response.message, "warning");
+			if (response.success === 'true') {
+
+				if (response.dataJson && response.dataJson.length > 0) {
+					// Hay paquetes pendientes por liberar
+					let detalle = '';
+					response.dataJson.forEach(item => {
+						detalle += `${item.tracking} - ${item.receiver} (Folio: ${item.folio})\n`;
+					});
+					swal(
+						"Paquetes pendientes por liberar",
+						detalle,
+						"warning"
+					);
+					$('.swal-button-container').hide();
+					setTimeout(function(){
+						swal.close();
+						window.location.reload();
+					}, 5500);
+				} else {
+					// Mensaje normal
+					swal(guia, response.message, "success");
+					$('.swal-button-container').hide();
+					setTimeout(function(){
+						swal.close();
+						window.location.reload();
+					}, 3500);
+				}
 			}
-			$('.swal-button-container').hide();
-			setTimeout(function(){
-				swal.close();
-				window.location.reload();
-			}, 3500);
+			else {
+				swal(guia, response.message, "warning");
+				$('.swal-button-container').hide();
+				setTimeout(function(){
+					swal.close();
+					window.location.reload();
+				}, 3500);
+			}
+			
 		}).fail(function(e) {
 			console.log("Opps algo salio mal",e);
 		});
@@ -442,68 +469,74 @@ $(document).ready(function() {
 			return;
 		}
 
+		let validarG = $('#checkG').is(':checked') ? 1 : 0;
 		let guia = '';
-		if($('#id_cat_parcel').val()==1){
-			let jtTracking = tracking.val().trim(); // Eliminar espacios en blanco al inicio y al final
-			let regex = /^JMX\d{12}$/;
-			if (jtTracking.length !== 15 || !regex.test(jtTracking.toUpperCase())) {
-				let mensajeError = "* Código de barras no válido:";
-				if (jtTracking.length !== 15) {
-					mensajeError += " Debe tener 15 caracteres";
-				} else {
-					mensajeError += " Formato no válido";
-				}
-				swal("Atención!", mensajeError, "error");
-				return;
-			}
-			let decodedText = $('#tracking').val();
-			guia = decodedText.substring(0, 3).toUpperCase() + decodedText.substring(3);
-		}else if($('#id_cat_parcel').val()==2){
-			let imTracking = tracking.val().trim(); // Eliminar espacios al inicio y al final
-			/* ── Normalizar a mayúsculas si empieza con im ── */
-			if (/^im\d{14}$/i.test(imTracking)) {     // "im" o "IM" + 14 dígitos
-				imTracking = imTracking.toUpperCase(); // lo convertimos a "IM...."
-			}
-			// Expresiones regulares para validar
-			const regexNumerico = /^\d{13,14}$/;       // Solo números, 13 o 14 dígitos
-			const regexIm = /^IM\d{14}$/;              // Empieza con IM seguido de 14 dígitos
+		if(validarG==1){
 
-			// Validar el formato
-			if (!regexNumerico.test(imTracking) && !regexIm.test(imTracking)) {
-				let mensajeError = "* Código de barras no válido:";
-
-				if (imTracking.startsWith("IM")) {
-					if (imTracking.length !== 16) {
-						mensajeError += " Los códigos 'IM' deben tener exactamente 16 caracteres.";
+			if($('#id_cat_parcel').val()==1){
+				let jtTracking = tracking.val().trim(); // Eliminar espacios en blanco al inicio y al final
+				let regex = /^JMX\d{12}$/;
+				if (jtTracking.length !== 15 || !regex.test(jtTracking.toUpperCase())) {
+					let mensajeError = "* Código de barras no válido:";
+					if (jtTracking.length !== 15) {
+						mensajeError += " Debe tener 15 caracteres";
 					} else {
-						mensajeError += " El formato debe ser 'IM' seguido de 14 dígitos.";
+						mensajeError += " Formato no válido";
 					}
-				} else if (/^\d+$/.test(imTracking)) {
-					mensajeError += " Debe tener 13 o 14 dígitos numéricos.";
-				} else {
-					mensajeError += " Solo se permiten números o formato 'IM' con 14 dígitos.";
+					swal("Atención!", mensajeError, "error");
+					return;
+				}
+				let decodedText = $('#tracking').val();
+				guia = decodedText.substring(0, 3).toUpperCase() + decodedText.substring(3);
+			}else if($('#id_cat_parcel').val()==2){
+				let imTracking = tracking.val().trim(); // Eliminar espacios al inicio y al final
+				/* ── Normalizar a mayúsculas si empieza con im ── */
+				if (/^im\d{14}$/i.test(imTracking)) {     // "im" o "IM" + 14 dígitos
+					imTracking = imTracking.toUpperCase(); // lo convertimos a "IM...."
+				}
+				// Expresiones regulares para validar
+				const regexNumerico = /^\d{13,14}$/;       // Solo números, 13 o 14 dígitos
+				const regexIm = /^IM\d{14}$/;              // Empieza con IM seguido de 14 dígitos
+
+				// Validar el formato
+				if (!regexNumerico.test(imTracking) && !regexIm.test(imTracking)) {
+					let mensajeError = "* Código de barras no válido:";
+
+					if (imTracking.startsWith("IM")) {
+						if (imTracking.length !== 16) {
+							mensajeError += " Los códigos 'IM' deben tener exactamente 16 caracteres.";
+						} else {
+							mensajeError += " El formato debe ser 'IM' seguido de 14 dígitos.";
+						}
+					} else if (/^\d+$/.test(imTracking)) {
+						mensajeError += " Debe tener 13 o 14 dígitos numéricos.";
+					} else {
+						mensajeError += " Solo se permiten números o formato 'IM' con 14 dígitos.";
+					}
+
+					swal("Atención!", mensajeError, "error");
+					return;
 				}
 
-				swal("Atención!", mensajeError, "error");
-				return;
-			}
-
-			guia = imTracking;
-		}else if($('#id_cat_parcel').val()==3){
-			let cnTracking = tracking.val().trim(); // Eliminar espacios en blanco al inicio y al final
-			let regex = /^CNMEX\d{10}$/;
-			if (cnTracking.length !== 15 || !regex.test(cnTracking.toUpperCase())) {
-				let mensajeError = "* Código de barras no válido:";
-				if (cnTracking.length !== 15) {
-					mensajeError += " Debe tener 15 caracteres";
-				} else {
-					mensajeError += " Formato no válido";
+				guia = imTracking;
+			}else if($('#id_cat_parcel').val()==3){
+				let cnTracking = tracking.val().trim(); // Eliminar espacios en blanco al inicio y al final
+				let regex = /^CNMEX\d{10}$/;
+				if (cnTracking.length !== 15 || !regex.test(cnTracking.toUpperCase())) {
+					let mensajeError = "* Código de barras no válido:";
+					if (cnTracking.length !== 15) {
+						mensajeError += " Debe tener 15 caracteres";
+					} else {
+						mensajeError += " Formato no válido";
+					}
+					swal("Atención!", mensajeError, "error");
+					return;
 				}
-				swal("Atención!", mensajeError, "error");
-				return;
+				let decodedText = $('#tracking').val();
+				guia = decodedText.substring(0, 5).toUpperCase() + decodedText.substring(5);
 			}
-			let decodedText = $('#tracking').val();
-			guia = decodedText.substring(0, 5).toUpperCase() + decodedText.substring(5);
+		}else{
+			guia = tracking.val().trim();
 		}
 
 		let file = null;
@@ -838,7 +871,8 @@ $(document).ready(function() {
 		}
 
 		let formData =  new FormData();
-		formData.append('id_location', idLocationSelected.val());
+		// formData.append('id_location', idLocationSelected.val());
+		formData.append('idTemplateMsj', idTemplateMsj);
 		formData.append('mTTemplate', $('#mTTemplate').val());
 		formData.append('option', 'saveTemplate');
 		try {
